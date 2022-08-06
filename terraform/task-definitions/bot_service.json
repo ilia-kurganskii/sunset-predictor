@@ -1,0 +1,10 @@
+[
+  {
+    "essential": true,
+    "memory": 128,
+    "name": "worker",
+    "cpu": 1,
+    "image": "nginx",
+    "environment": []
+  }
+]
