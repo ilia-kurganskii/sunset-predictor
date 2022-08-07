@@ -11,7 +11,7 @@ ffmpeg \
   -color_trc 1 \
   -colorspace 1 \
   -movflags +faststart \
-  -filter:v "setpts=0.1*PTS" \
+  -filter:v "setpts=$TIMELAPSE_FACTOR*PTS" \
   -an \
   output.webm
 
