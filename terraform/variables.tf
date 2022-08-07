@@ -13,3 +13,8 @@ variable "place" {
 variable "recorder_image_version" {
   type = string
 }
+
+variable "openweather_token" {
+  type = string
+  description = "Open Weather Token"
+}

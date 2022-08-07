@@ -2,6 +2,9 @@ resource "aws_cloudwatch_event_rule" "capture_sunset" {
   name                = "capture-the-sunset"
   description         = "Capture sunset in ${var.place.displayName}"
   schedule_expression = "cron(${var.place.sunset_time_m_utc} ${var.place.sunset_time_h_utc} * * ? *)"
+  lifecycle {
+    ignore_changes = [schedule_expression]
+  }
 }
 
 resource "aws_cloudwatch_event_target" "ecs_task" {

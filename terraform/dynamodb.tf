@@ -1,13 +1,3 @@
-resource "aws_dynamodb_table" "places" {
-  billing_mode     = "PAY_PER_REQUEST"
-  name             = "places"
-  attribute {
-    name = "placeId"
-    type = "S"
-  }
-  hash_key = "placeId"
-}
-
 resource "aws_dynamodb_table" "records" {
   billing_mode     = "PAY_PER_REQUEST"
   name             = "records"
