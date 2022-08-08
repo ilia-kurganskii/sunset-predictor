@@ -1,7 +1,9 @@
-name: "Terraform"
+name: "Sunset recorder"
 
 on:
   push:
+    paths:
+      - sunset-recorder/**
     branches:
       - master
 
@@ -27,7 +29,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
         with:
-          # terraform_version: 0.13.0:
+          terraform_wrapper: false
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Set up QEMU
@@ -42,8 +44,7 @@ jobs:
 
       - name: Build, tag, and push image to Amazon ECR
         run: |
-          ECR_URL=$(terraform -chdir=terraform output ecr_repository_url)
-          docker build -t $ECR_URL:${{ github.run_id }} -t $ECR_URL:latest ./sunset-recorder
-          docker push $ECR_URL:${{ github.run_id }}
+          ECR_URL=$(terraform -chdir=terraform output -raw  ecr_repository_url)
+          docker build -t $ECR_URL:$GITHUB_RUN_ID -t $ECR_URL:latest ./sunset-recorder
+          docker push $ECR_URL:$GITHUB_RUN_ID
           docker push $ECR_URL:latest
-        
