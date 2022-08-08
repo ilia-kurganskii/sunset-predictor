@@ -1,6 +1,6 @@
 resource "aws_dynamodb_table" "records" {
-  billing_mode     = "PAY_PER_REQUEST"
-  name             = "records"
+  billing_mode = "PAY_PER_REQUEST"
+  name         = "records"
   attribute {
     name = "recordId"
     type = "S"
@@ -9,8 +9,8 @@ resource "aws_dynamodb_table" "records" {
 }
 
 resource "aws_dynamodb_table" "polls" {
-  billing_mode     = "PAY_PER_REQUEST"
-  name             = "polls"
+  billing_mode = "PAY_PER_REQUEST"
+  name         = "polls"
   attribute {
     name = "pollId"
     type = "S"
@@ -19,8 +19,8 @@ resource "aws_dynamodb_table" "polls" {
 }
 
 resource "aws_dynamodb_table" "predictions" {
-  billing_mode     = "PAY_PER_REQUEST"
-  name             = "predictions"
+  billing_mode = "PAY_PER_REQUEST"
+  name         = "predictions"
   attribute {
     name = "predictionId"
     type = "S"

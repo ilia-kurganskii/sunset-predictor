@@ -15,6 +15,6 @@ variable "recorder_image_version" {
 }
 
 variable "openweather_token" {
-  type = string
+  type        = string
   description = "Open Weather Token"
 }
