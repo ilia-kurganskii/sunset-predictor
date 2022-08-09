@@ -40,6 +40,10 @@ jobs:
         working-directory: "terraform/environments/${{ github.event.inputs.env }}"
         id: init
         run: |
+          echo ${{ github.event.inputs.env }}
+          echo ${{ inputs.env }}
+          echo "terraform/environments/${{ github.event.inputs.env }}"
+          echo "terraform/environments/${{ inputs.env }}"
           ls
           pwd
           terraform init
