@@ -37,6 +37,10 @@ jobs:
         working-directory: telegram-bot
         run: yarn install --frozen-lockfile
 
+      - name: Terraform init
+        working-directory: terraform
+        run: terraform init
+
       - name: Build
         working-directory: telegram-bot
         run: yarn build
