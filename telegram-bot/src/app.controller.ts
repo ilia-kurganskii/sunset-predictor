@@ -17,6 +17,7 @@ export class AppController {
   ) => {
     try {
       console.log('EVENT', event);
+      console.log('MORE', JSON.stringify(process.env));
       let { type, id, file } = event;
       switch (type) {
         case 'video_recorded': {
