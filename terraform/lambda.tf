@@ -10,8 +10,8 @@ resource "aws_lambda_function" "telegram_bot" {
   s3_key            = data.aws_s3_object.lambda_zip.key
   s3_object_version = data.aws_s3_object.lambda_zip.version_id
 
-  runtime           = "nodejs16.x"
-  handler           = "main.handler"
+  runtime = "nodejs16.x"
+  handler = "main.handler"
 
   role = aws_iam_role.lambda_exec.arn
 
@@ -34,12 +34,12 @@ resource "aws_iam_role" "lambda_exec" {
   name = "serverless_lambda"
 
   assume_role_policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
-        Action    = "sts:AssumeRole"
-        Effect    = "Allow"
-        Sid       = ""
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
         Principal = {
           Service = "lambda.amazonaws.com"
         }
