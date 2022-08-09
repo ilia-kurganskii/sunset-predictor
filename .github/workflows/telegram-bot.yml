@@ -56,4 +56,4 @@ jobs:
         run: |
           BUCKET=$(terraform -chdir=terraform output -raw  s3_lambda_bucket)
           BUCKET_KEY=$(terraform -chdir=terraform output -raw  s3_lambda_bucket_key)
-          s3 cp ./telegram-bot/dist.zip s3://$BUCKET/$BUCKET_KEY
+          aws s3 cp ./telegram-bot/dist.zip s3://$BUCKET/$BUCKET_KEY
