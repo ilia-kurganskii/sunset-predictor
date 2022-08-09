@@ -37,7 +37,7 @@ jobs:
         run: terraform fmt -check -recursive -diff
 
       - name: Terraform Init
-        working-directory: "terraform/environments/${{ github.event.inputs.env}}"
+        working-directory: "terraform/environments/${{ github.event.inputs.env }}"
         id: init
         run: |
           ls
