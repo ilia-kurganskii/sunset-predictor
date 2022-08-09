@@ -43,7 +43,11 @@ jobs:
       - name: Terraform Apply (Prod)
         working-directory: terraform/environments/prod
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+        run: |
+          terraform apply -auto-approve \
+            -var="telegram_token=$TELEGRAM_BOT_TOKEN" \
+            -var="telegram_chat_id=$TELEGRAM_CHAT_ID" \
+            -var="open_weather_token=$OPEN_WEATHER_TOKEN"
 
   telegram-bot:
     environment: production
