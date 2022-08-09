@@ -5,7 +5,7 @@ resource "aws_ecr_repository" "sunset_recorder" {
 resource "aws_ecr_lifecycle_policy" "foopolicy" {
   repository = aws_ecr_repository.sunset_recorder.name
 
-  policy = jsondecode(
+  policy = jsonencode(
     {
       "rules" : [
         {

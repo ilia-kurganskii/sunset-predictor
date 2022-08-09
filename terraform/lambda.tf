@@ -6,8 +6,8 @@ data "aws_s3_object" "lambda_zip" {
 resource "aws_lambda_function" "telegram_bot" {
   function_name = "TelegramBot"
 
-  s3_bucket         = aws_s3_bucket.telegram_bot_lambda_function.id
-  s3_key            = data.aws_s3_object.lambda_zip.key
+  s3_bucket = aws_s3_bucket.telegram_bot_lambda_function.id
+  s3_key    = data.aws_s3_object.lambda_zip.key
 
   runtime = "nodejs16.x"
   handler = "main.handler"
