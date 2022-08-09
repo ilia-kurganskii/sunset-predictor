@@ -50,7 +50,7 @@ jobs:
         run: |
           yarn install --production
           mv node_modules ./dist/
-          zip dist.zip ./dist/**/*
+          zip -r dist.zip ./dist
 
       - name: Deploy
         run: |
