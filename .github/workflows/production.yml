@@ -1,4 +1,4 @@
-name: "Terraform"
+name: "Production"
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 jobs:
   terraform:
     environment: production
-    name: "Terraform Dev"
+    name: "Terraform"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

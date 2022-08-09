@@ -1,4 +1,4 @@
-name: "Terraform"
+name: "Development"
 
 on:
   pull_request:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   terraform:
-    name: "Terraform Dev"
+    name: "Terraform"
     environment: development
     runs-on: ubuntu-latest
     steps:
