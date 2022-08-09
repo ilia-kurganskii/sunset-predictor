@@ -19,7 +19,7 @@ on:
 
 jobs:
   terraform:
-    name: "Terraform"
+    name: "Terraform Dev"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,17 +37,17 @@ jobs:
         run: terraform fmt -check -recursive -diff
 
       - name: Terraform Init
-        working-directory: terraform/environments/${{ inputs.env }}
+        working-directory: "terraform/environments/${{ github.event.inputs.env}}"
         id: init
         run: terraform init
 
       - name: Terraform Validate
-        working-directory: terraform/environments/${{ inputs.env }}
+        working-directory: "terraform/environments/${{ github.event.inputs.env}}"
         id: validate
         run: terraform validate -no-color
 
       - name: Terraform Plan
-        working-directory: terraform/environments/${{ inputs.env }}
+        working-directory: "terraform/environments/${{ github.event.inputs.env}}"
         id: plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color -input=false
@@ -94,7 +94,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Terraform init
-        working-directory: terraform/environments/${{ inputs.env }}
+        working-directory: "terraform/environments/${{ github.event.inputs.env}}"
         run: terraform init
 
       - name: Build
@@ -110,15 +110,15 @@ jobs:
 
       - name: Upload to S3
         run: |
-          BUCKET=$(terraform -chdir=terraform/environments/${{ inputs.env }} output -raw  s3_lambda_bucket)
-          BUCKET_KEY=$(terraform -chdir=terraform/environments/${{ inputs.env }} output -raw  s3_lambda_bucket_key)
+          BUCKET=$(terraform -chdir="terraform/environments/${{ github.event.inputs.env}}" output -raw  s3_lambda_bucket)
+          BUCKET_KEY=$(terraform -chdir="terraform/environments/${{ github.event.inputs.env}}" output -raw  s3_lambda_bucket_key)
           aws s3 cp ./telegram-bot/dist.zip s3://$BUCKET/$BUCKET_KEY
 
       - name: Update function
         run: |
-          BUCKET=$(terraform -chdir=terraform/environments/${{ inputs.env }} output -raw  s3_lambda_bucket)
-          BUCKET_KEY=$(terraform -chdir=terraform/environments/${{ inputs.env }} output -raw  s3_lambda_bucket_key)
-          NAME=$(terraform -chdir=terraform/environments/${{ inputs.env }} output -raw  lambda_name)
+          BUCKET=$(terraform -chdir="terraform/environments/${{ github.event.inputs.env}}" output -raw  s3_lambda_bucket)
+          BUCKET_KEY=$(terraform -chdir="terraform/environments/${{ github.event.inputs.env}}" output -raw  s3_lambda_bucket_key)
+          NAME=$(terraform -chdir="terraform/environments/${{ github.event.inputs.env}}" output -raw  lambda_name)
           aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $BUCKET_KEY
           aws lambda publish-version --function-name $NAME
   
@@ -157,12 +157,12 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Terraform Init
-        working-directory: terraform/environments/${{ inputs.env }}
+        working-directory: "terraform/environments/${{ github.event.inputs.env}}"
         run: terraform init
 
       - name: Build, tag, and push image to Amazon ECR
         run: |
-          ECR_URL=$(terraform -chdir=terraform/environments/${{ inputs.env }} output -raw  ecr_repository_url)
+          ECR_URL=$(terraform -chdir="terraform/environments/${{ github.event.inputs.env}}" output -raw  ecr_repository_url)
           docker build -t $ECR_URL:$GITHUB_RUN_ID -t $ECR_URL:latest ./sunset-recorder
           docker push $ECR_URL:$GITHUB_RUN_ID
           docker push $ECR_URL:latest
