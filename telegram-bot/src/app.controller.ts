@@ -32,7 +32,7 @@ export class AppController {
   }): Promise<void> => {
     const url = await this.awsService.getSignedUrlForFile(params.file);
     await this.telegramService.sendVideo({
-      caption: 'Sunset',
+      caption: 'Sunset (95%)',
       videoUrl: url,
     });
     await this.telegramService.sendPoll({
