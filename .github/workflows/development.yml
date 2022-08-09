@@ -11,6 +11,7 @@ on:
 jobs:
   terraform:
     name: "Terraform Dev"
+    environment: development
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -50,6 +51,7 @@ jobs:
 
   telegram-bot:
     name: "Telegram bot"
+    environment: development
     runs-on: ubuntu-latest
     needs:
       - terraform
@@ -113,6 +115,7 @@ jobs:
 
   recorder-service:
     name: "Recorder service"
+    environment: development
     runs-on: ubuntu-latest
     needs:
       - terraform
