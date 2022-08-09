@@ -15,15 +15,19 @@ export class AppController {
     context: Context,
     callback: Callback,
   ) => {
-    console.log('EVENT', event);
-    let { type, id, file } = event;
-    switch (type) {
-      case 'video_recorded': {
-        await this.sendNewPollToChat({ id, file });
-        break;
+    try {
+      console.log('EVENT', event);
+      let { type, id, file } = event;
+      switch (type) {
+        case 'video_recorded': {
+          await this.sendNewPollToChat({ id, file });
+          break;
+        }
       }
+      callback(null, 'success');
+    } catch (e) {
+      callback(e, null);
     }
-    callback(null, 'success');
   };
 
   private sendNewPollToChat = async (params: {

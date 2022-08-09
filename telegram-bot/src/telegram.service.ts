@@ -12,7 +12,7 @@ export class TelegramService {
     console.log(params.videoUrl);
     await this.sendRequest('sendVideo', {
       caption: params.caption,
-      video: params.videoUrl,
+      video: encodeURI(params.videoUrl),
       chat_id: process.env.TELEGRAM_CHAT_ID,
     });
   };
@@ -35,12 +35,23 @@ export class TelegramService {
     methodName: string,
     params: Record<string, any>,
   ) => {
-    return await this.httpService.axiosRef.post(
-      `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/${methodName}`,
-      {},
-      {
-        params,
-      },
-    );
+    try {
+      return await this.httpService.axiosRef.post(
+        `https://api.telegram.org/bot${process.env.TELEGRAM_TOKEN}/${methodName}`,
+        {},
+        {
+          params,
+        },
+      );
+    } catch (e) {
+      throw new Error(`API Error: ${extractErrorMessage(e)}`);
+    }
   };
+}
+
+function extractErrorMessage(e: any) {
+  if (e.response?.data) {
+    return JSON.stringify(e.response.data);
+  }
+  return e.message;
 }

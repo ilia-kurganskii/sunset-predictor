@@ -23,3 +23,12 @@ export const handler: Handler = async (
   const handler = await bootstrapServer();
   return handler.processEvent(event, context, callback);
 };
+
+handler(
+  {
+    type: 'video_recorded',
+    file: '2022-08-08/file_original.mp4',
+  },
+  null,
+  () => {},
+);
