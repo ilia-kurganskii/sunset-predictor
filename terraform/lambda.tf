@@ -10,7 +10,7 @@ resource "aws_lambda_function" "telegram_bot" {
   s3_key    = data.aws_s3_object.lambda_zip.key
 
   runtime = "nodejs16.x"
-  handler = "main.handler"
+  handler = "dist/main.handler"
 
   role = aws_iam_role.lambda_exec.arn
 
