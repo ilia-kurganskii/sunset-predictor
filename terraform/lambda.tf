@@ -29,6 +29,11 @@ resource "aws_cloudwatch_log_group" "telegram_bot" {
   retention_in_days = 30
 }
 
+resource "aws_lambda_function_url" "lambda_url" {
+  function_name      = aws_lambda_function.telegram_bot.function_name
+  authorization_type = "NONE"
+}
+
 resource "aws_iam_role" "lambda_exec" {
   name = "serverless_lambda"
 
