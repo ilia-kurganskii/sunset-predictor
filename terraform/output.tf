@@ -10,7 +10,7 @@ output "s3_lambda_bucket_key" {
   value = aws_lambda_function.telegram_bot.s3_key
 }
 
-output "s3_lambda_name" {
+output "lambda_name" {
   value = aws_lambda_function.telegram_bot.function_name
 }
 

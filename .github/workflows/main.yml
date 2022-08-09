@@ -61,7 +61,7 @@ jobs:
         run: |
           BUCKET=$(terraform -chdir=terraform output -raw  s3_lambda_bucket)
           BUCKET_KEY=$(terraform -chdir=terraform output -raw  s3_lambda_bucket_key)
-          NAME=$(terraform -chdir=terraform output -raw  s3_lambda_name)
+          NAME=$(terraform -chdir=terraform output -raw  lambda_name)
           aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET_KEY --s3-key $BUCKET_KEY
           aws lambda publish-version --function-name $NAME
           
