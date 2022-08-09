@@ -47,9 +47,9 @@ jobs:
       - name: Terraform Apply (Dev)
         working-directory: terraform/environments/dev
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.$TELEGRAM_BOT_TOKEN }}
-          OPEN_WEATHER_TOKEN: ${{ secrets.$OPEN_WEATHER_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.$TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          OPEN_WEATHER_TOKEN: ${{ secrets.OPEN_WEATHER_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
         run: |
           terraform apply -auto-approve \

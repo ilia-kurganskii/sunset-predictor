@@ -44,9 +44,9 @@ jobs:
         working-directory: terraform/environments/prod
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.$TELEGRAM_BOT_TOKEN }}
-          OPEN_WEATHER_TOKEN: ${{ secrets.$OPEN_WEATHER_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.$TELEGRAM_CHAT_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          OPEN_WEATHER_TOKEN: ${{ secrets.OPEN_WEATHER_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           terraform apply -auto-approve \
             -var="telegram_token=$TELEGRAM_BOT_TOKEN" \
