@@ -1,7 +1,7 @@
 [
   {
     "essential": true,
-    "memory": 600,
+    "memory": 300,
     "name": "sunset-recorder",
     "cpu": 500,
     "image": "${repository_url}:${image_version}",
@@ -23,6 +23,7 @@
         { "name": "OPENWEATHER_TOKEN", "value": "${openweather_token}" },
         { "name": "AWS_TABLE_NAME", "value": "${records_table_name}" },
         { "name": "AWS_BUCKET", "value": "${bucket}" },
+        { "name": "AWS_LAMBDA_NAME", "value": "${lambda_name}" },
         { "name": "AWS_EVENT_RULE_NAME", "value": "${eventRuleName}" },
         { "name": "AWS_DEFAULT_REGION", "value": "eu-west-3" }
     ]

@@ -11,6 +11,7 @@ resource "aws_ecs_task_definition" "task_definition" {
     openweather_token  = var.openweather_token,
     records_table_name = aws_dynamodb_table.records.name,
     bucket             = aws_s3_bucket.records.bucket
+    lambda_name        = aws_lambda_function.telegram_bot.function_name,
     eventRuleName      = aws_cloudwatch_event_rule.capture_sunset[each.key].name
   })
 }
