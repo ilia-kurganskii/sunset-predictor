@@ -56,6 +56,14 @@ jobs:
           BUCKET=$(terraform -chdir=terraform output -raw  s3_lambda_bucket)
           BUCKET_KEY=$(terraform -chdir=terraform output -raw  s3_lambda_bucket_key)
           aws s3 cp ./telegram-bot/dist.zip s3://$BUCKET/$BUCKET_KEY
+
+      - name: Update function
+        run: |
+          BUCKET=$(terraform -chdir=terraform output -raw  s3_lambda_bucket)
+          BUCKET_KEY=$(terraform -chdir=terraform output -raw  s3_lambda_bucket_key)
+          NAME=$(terraform -chdir=terraform output -raw  s3_lambda_name)
+          aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET_KEY --s3-key $BUCKET_KEY
+          aws lambda publish-version --function-name $NAME
           
 
   recorder-service:

@@ -8,9 +8,7 @@ resource "aws_lambda_function" "telegram_bot" {
 
   s3_bucket         = aws_s3_bucket.telegram_bot_lambda_function.id
   s3_key            = data.aws_s3_object.lambda_zip.key
-  s3_object_version = data.aws_s3_object.lambda_zip.version_id
 
-  publish = true
   runtime = "nodejs16.x"
   handler = "main.handler"
 
