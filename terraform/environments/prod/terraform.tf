@@ -3,11 +3,11 @@ terraform {
     organization = "zmeiko"
 
     workspaces {
-      name = "sunset-predictor-workspace"
+      name = "production-sunset-predictor"
     }
   }
 }
 
 provider "aws" {
-  region = "eu-west-3"
+  region = local.aws_region
 }

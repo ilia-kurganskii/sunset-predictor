@@ -4,7 +4,7 @@ data "aws_s3_object" "lambda_zip" {
 }
 
 resource "aws_lambda_function" "telegram_bot" {
-  function_name = "TelegramBot"
+  function_name = "${var.env}_telegram_bot"
 
   s3_bucket = aws_s3_bucket.telegram_bot_lambda_function.id
   s3_key    = data.aws_s3_object.lambda_zip.key
@@ -18,7 +18,7 @@ resource "aws_lambda_function" "telegram_bot" {
     variables = {
       TELEGRAM_TOKEN     = var.telegram_token
       TELEGRAM_CHAT_ID   = var.telegram_chat_id
-      AWS_RECORDS_BUCKET = aws_s3_bucket.records.bucket
+      AWS_RECORDS_BUCKET = var.bucket_records_name
     }
   }
 }
@@ -35,7 +35,7 @@ resource "aws_lambda_function_url" "lambda_url" {
 }
 
 resource "aws_iam_role" "lambda_exec" {
-  name = "serverless_lambda"
+  name = "${var.env}_serverless_lambda"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"

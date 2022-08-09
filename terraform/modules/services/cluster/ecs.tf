@@ -1,5 +1,5 @@
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "sunset"
+  name = "${var.env}_sunset_cluster"
 }
 
 resource "aws_ecs_cluster_capacity_providers" "ecs_cluster_provider" {
@@ -15,7 +15,7 @@ resource "aws_ecs_cluster_capacity_providers" "ecs_cluster_provider" {
 }
 
 resource "aws_ecs_capacity_provider" "ec2_capacity_provider" {
-  name = "ec2_capacity_provider"
+  name = "${var.env}_ec2_capacity_provider"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn         = aws_autoscaling_group.ecs_asg.arn

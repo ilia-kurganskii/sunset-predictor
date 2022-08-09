@@ -1,8 +1,8 @@
 resource "aws_ecr_repository" "sunset_recorder" {
-  name = "sunset_recorder"
+  name = "${var.env}-sunset_recorder"
 }
 
-resource "aws_ecr_lifecycle_policy" "foopolicy" {
+resource "aws_ecr_lifecycle_policy" "remove_old_image" {
   repository = aws_ecr_repository.sunset_recorder.name
 
   policy = jsonencode(

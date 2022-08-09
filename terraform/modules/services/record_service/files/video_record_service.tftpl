@@ -9,7 +9,7 @@
       "logDriver": "awslogs",
       "options": {
         "awslogs-group": "sunset-recorder-container",
-        "awslogs-region": "eu-west-3",
+        "awslogs-region": "${aws_region}",
         "awslogs-create-group": "true",
         "awslogs-stream-prefix": "sunset-recorder"
       }
@@ -25,7 +25,7 @@
         { "name": "AWS_BUCKET", "value": "${bucket}" },
         { "name": "AWS_LAMBDA_NAME", "value": "${lambda_name}" },
         { "name": "AWS_EVENT_RULE_NAME", "value": "${eventRuleName}" },
-        { "name": "AWS_DEFAULT_REGION", "value": "eu-west-3" }
+        { "name": "AWS_DEFAULT_REGION", "value": "${aws_region}" }
     ]
   }
 ]

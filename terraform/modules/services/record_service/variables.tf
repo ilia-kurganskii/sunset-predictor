@@ -1,3 +1,12 @@
+variable "env" {
+  type        = string
+  description = "Environment"
+}
+
+variable "aws_region" {
+  type = string
+}
+
 variable "places" {
   type = map(object({
     id                = string
@@ -16,17 +25,29 @@ variable "recorder_image_version" {
   default = "latest"
 }
 
-variable "openweather_token" {
+variable "open_weather_token" {
   type        = string
   description = "Open Weather Token"
+  sensitive   = true
 }
 
-variable "telegram_token" {
+variable "cluster_arn" {
   type        = string
-  description = "Telegram bot token"
+  description = "Cluster ARN"
 }
 
-variable "telegram_chat_id" {
-  type        = string
-  description = "Telegram chat id"
+variable "dynamodb_table_records_name" {
+  type = string
+}
+
+variable "bucket_records_name" {
+  type = string
+}
+
+variable "lambda_function_name" {
+  type = string
+}
+
+variable "docker_repository_url" {
+  type = string
 }
