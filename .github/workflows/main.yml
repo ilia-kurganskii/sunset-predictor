@@ -9,7 +9,7 @@ on:
 
 jobs:
   telegram-bot:
-    name: "Build and deploy"
+    name: "Telegram bot"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -51,7 +51,7 @@ jobs:
           mv node_modules ./dist/
           zip -r dist.zip ./dist
 
-      - name: Deploy
+      - name: Upload to S3
         run: |
           BUCKET=$(terraform -chdir=terraform output -raw  s3_lambda_bucket)
           BUCKET_KEY=$(terraform -chdir=terraform output -raw  s3_lambda_bucket_key)
@@ -59,7 +59,7 @@ jobs:
           
 
   recorder-service:
-    name: "Build and deploy"
+    name: "Recorder service"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
