@@ -1,4 +1,4 @@
-name: "Sunset recorder"
+name: "Recorder service"
 
 on:
   push:

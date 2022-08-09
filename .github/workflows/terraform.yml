@@ -1,10 +1,12 @@
 name: "Terraform"
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
+  workflow_run:
+    workflows: [ "Telegram bot", "Recorder service" ]
+    branches: [ master, feat/telegram-bot ]
+    types:
+      - completed
 
 jobs:
   terraform:
