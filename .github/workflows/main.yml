@@ -8,9 +8,51 @@ on:
 
 
 jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          # terraform_version: 0.13.0:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        working-directory: terraform
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        working-directory: terraform
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: terraform
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        working-directory: terraform
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color -input=false
+
+      - name: Terraform Apply
+        working-directory: terraform
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
+
   telegram-bot:
     name: "Telegram bot"
     runs-on: ubuntu-latest
+    needs:
+      - terraform
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -64,11 +106,14 @@ jobs:
           NAME=$(terraform -chdir=terraform output -raw  lambda_name)
           aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET_KEY --s3-key $BUCKET_KEY
           aws lambda publish-version --function-name $NAME
-          
+  
 
   recorder-service:
     name: "Recorder service"
     runs-on: ubuntu-latest
+    needs:
+      - terraform
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -109,45 +154,3 @@ jobs:
 
 
 
-  terraform:
-    name: "Terraform"
-    runs-on: ubuntu-latest
-    needs:
-      - telegram-bot
-      - recorder-service
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          # terraform_version: 0.13.0:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Terraform Format
-        working-directory: terraform
-        id: fmt
-        run: terraform fmt -check
-
-      - name: Terraform Init
-        working-directory: terraform
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        working-directory: terraform
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Plan
-        working-directory: terraform
-        id: plan
-        if: github.event_name == 'pull_request'
-        run: terraform plan -no-color -input=false
-
-      - name: Terraform Apply
-        working-directory: terraform
-#        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
