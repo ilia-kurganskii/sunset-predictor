@@ -28,16 +28,9 @@ jobs:
         run: terraform fmt -check -recursive -diff
 
       - name: Terraform Init
-        working-directory: "terraform/environments/${{ github.event.inputs.env }}"
+        working-directory: terraform/environments/prod
         id: init
-        run: |
-          echo ${{ github.event.inputs.env }}
-          echo ${{ inputs.env }}
-          echo "terraform/environments/${{ github.event.inputs.env }}"
-          echo "terraform/environments/${{ inputs.env }}"
-          ls
-          pwd
-          terraform init
+        run: terraform init
 
       - name: Terraform Validate
         working-directory: terraform/environments/prod
