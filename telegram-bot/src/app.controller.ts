@@ -26,6 +26,7 @@ export class AppController {
       }
       callback(null, 'success');
     } catch (e) {
+      console.error(e);
       callback(e, null);
     }
   };
