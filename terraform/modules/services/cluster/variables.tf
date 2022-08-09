@@ -7,6 +7,11 @@ variable "instance_type" {
   default = "t2.micro"
 }
 
+variable "instance_spot_price" {
+  type    = string
+  default = null
+}
+
 variable "instance_ami" {
   type    = string
   default = "ami-0f51be0cf2e87b06c"

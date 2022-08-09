@@ -6,6 +6,7 @@ resource "aws_launch_configuration" "ecs_launch_config" {
   user_data                   = file("${path.module}/files/register-cluster.sh")
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.generated_key.key_name
+  spot_price                  = var.instance_spot_price
   associate_public_ip_address = true
 }
 
