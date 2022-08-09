@@ -77,6 +77,13 @@ parser.add_argument('--aws-event-rule-name',
                     help='AWS event name',
                     **environ_or_required('AWS_EVENT_RULE_NAME'))
 
+parser.add_argument('--aws-lambda-bot-function-name',
+                    type=str,
+                    dest='lambda_name',
+                    metavar='NAME',
+                    help='AWS lambda name (Telegram bot)',
+                    **environ_or_required('AWS_LAMBDA_NAME'))
+
 parser.add_argument('--timelapse-factor',
                     type=str,
                     dest='timelapse_factor',
@@ -88,29 +95,31 @@ args = parser.parse_args()
 
 # Save video stream to file
 
-# QUALITY 1-perfect 50-bad
-quality = 23
-
-result = subprocess.run(["/usr/local/bin/ffmpeg", "-i", args.input_url,
+subprocess.run(["/usr/local/bin/ffmpeg",
+                        "-i", args.input_url,
                          "-t", args.duration,
-                         "-c:v", "libvpx-vp9",
-                         "-crf", "23",
-                         "-speed", "3",
-                         "-pix_fmt", "yuv420p",
-                         "-color_primaries", "1",
-                         "-color_trc", "1",
-                         "-colorspace", "1",
-                         "-movflags", "+faststart",
-                         "-filter:v", f"setpts={args.timelapse_factor}*PTS",
-                         "-an",
-                         "output.webm"], check=True)
+                         "-vcodec", "libx265", # CODEC
+                         "-crf", "23", # QUALITY
+                         "-filter:v", f"setpts={args.timelapse_factor}*PTS", # TIMELAPSE
+                         "-an", # ONLY VIDEO
+                         "recorded_stream.mp4"], check=True)
+
+# Add silence to video to prevent converting to GIF (Telegram convert video without sound to GIF)
+subprocess.run(["/usr/local/bin/ffmpeg",
+                         "-i","recorded_stream.mp4",
+                         "-f", "lavfi",
+                         "-i", "anullsrc",
+                         "-c:v", "copy",
+                         "-c:a", "aac",
+                         "-shortest",
+                         "output.mp4"], check=True)
 
 # Upload video to S3 bucket
 s3 = boto3.resource('s3')
 
 today_date_formatted = datetime.today().strftime('%Y-%m-%d')
-video_file_key = f'{today_date_formatted}/v2/video.webm'
-data = open('output.webm', 'rb')
+video_file_key = f'{today_date_formatted}/{args.latitude}_{args.longitude}/video_{datetime.timestamp(datetime.now())}.mp4'
+data = open('output.mp4', 'rb')
 s3.Bucket(args.aws_bucket).put_object(Key=video_file_key, Body=data)
 
 # Get current weather
@@ -124,6 +133,7 @@ response = requests.get("https://api.openweathermap.org/data/3.0/onecall", param
 jsonResponse = json.loads(response.text, parse_float=Decimal)
 currentWeather = jsonResponse['current']
 sunsetUTC = datetime.utcfromtimestamp(currentWeather['sunset']).timetuple()
+
 
 def python_obj_to_dynamo_obj(python_obj: dict) -> dict:
     serializer = TypeSerializer()
@@ -148,5 +158,15 @@ table.put_item(
 eventBridgeClient = boto3.client('events')
 eventBridgeClient.put_rule(
     Name=args.event_name,
-    ScheduleExpression=f'cron({sunsetUTC.tm_min-13} {sunsetUTC.tm_hour} * * ? *)'
+    ScheduleExpression=f'cron({sunsetUTC.tm_min - 13} {sunsetUTC.tm_hour} * * ? *)'
+)
+
+# Send message to telegram
+
+lambdaClient = boto3.client('lambda')
+
+response = lambdaClient.invoke(
+    FunctionName=args.lambda_name,
+    InvocationType='Event',
+    Payload=json.dumps({ "type" : "video_recorded", "file" : video_file_key}),
 )
