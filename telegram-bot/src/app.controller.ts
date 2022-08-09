@@ -37,7 +37,7 @@ export class AppController {
     });
     await this.telegramService.sendPoll({
       question: 'Rate the sunset^',
-      options: ['5', '4', '3', '2', '1'],
+      options: ['5', '4', '3', '2', '1', 'Colored clouds', 'Clean horizons'],
       allows_multiple_answers: true,
     });
   };

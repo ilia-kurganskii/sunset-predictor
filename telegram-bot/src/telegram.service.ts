@@ -12,7 +12,7 @@ export class TelegramService {
     console.log(params.videoUrl);
     await this.sendRequest('sendVideo', {
       caption: params.caption,
-      video: params.videoUrl,
+      video: encodeURI(params.videoUrl),
       chat_id: process.env.TELEGRAM_CHAT_ID,
     });
   };
