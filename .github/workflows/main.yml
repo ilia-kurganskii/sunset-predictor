@@ -39,7 +39,10 @@ jobs:
       - name: Terraform Init
         working-directory: "terraform/environments/${{ github.event.inputs.env}}"
         id: init
-        run: terraform init
+        run: |
+          ls
+          pwd
+          terraform init
 
       - name: Terraform Validate
         working-directory: "terraform/environments/${{ github.event.inputs.env}}"
