@@ -23,7 +23,7 @@ module "record_service" {
   env                         = local.env
   bucket_records_name         = module.core.bucket_records_name
   cluster_arn                 = module.cluster.cluster_arn
-  docker_repository_url       = module.cluster.cluster_arn
+  docker_repository_url       = module.cluster.repository_url
   dynamodb_table_records_name = module.core.dynamodb_table_records_name
   lambda_function_name        = module.telegram_bot.lambda_function_name
   open_weather_token          = var.open_weather_token
