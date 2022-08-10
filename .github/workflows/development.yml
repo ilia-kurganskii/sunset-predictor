@@ -119,8 +119,7 @@ jobs:
           BUCKET=$(terraform -chdir=terraform/environments/dev output -raw  s3_lambda_bucket)
           BUCKET_KEY=$(terraform -chdir=terraform/environments/dev output -raw  s3_lambda_bucket_key)
           NAME=$(terraform -chdir=terraform/environments/dev output -raw  lambda_name)
-          aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $BUCKET_KEY
-          aws lambda publish-version --function-name $NAME
+          aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $BUCKET_KEY --publish
   
 
   recorder-service:
