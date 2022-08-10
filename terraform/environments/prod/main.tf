@@ -30,6 +30,7 @@ module "record_service" {
 module "telegram_bot" {
   source              = "../../modules/services/telegram_bot_service"
   bucket_records_name = module.core.bucket_records_name
+  bucket_records_arn  = module.core.bucket_records_arn
   env                 = local.env
   open_weather_token  = var.open_weather_token
   telegram_chat_id    = var.telegram_chat_id

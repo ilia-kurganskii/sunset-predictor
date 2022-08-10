@@ -24,3 +24,8 @@ variable "telegram_chat_id" {
 variable "bucket_records_name" {
   type = string
 }
+
+variable "bucket_records_arn" {
+  type = string
+}
+
