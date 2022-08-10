@@ -8,6 +8,7 @@ resource "aws_ecs_task_definition" "task_definition" {
     latitude           = each.value.lat,
     longitude          = each.value.lon,
     place_id           = each.key,
+    env                = var.env,
     openweather_token  = var.open_weather_token,
     records_table_name = var.dynamodb_table_records_name,
     bucket             = var.bucket_records_name,

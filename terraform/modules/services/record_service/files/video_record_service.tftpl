@@ -11,7 +11,7 @@
         "awslogs-group": "sunset-recorder-container",
         "awslogs-region": "${aws_region}",
         "awslogs-create-group": "true",
-        "awslogs-stream-prefix": "sunset-recorder"
+        "awslogs-stream-prefix": "${env}-sunset-recorder"
       }
     },
     "environment":[
