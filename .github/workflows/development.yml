@@ -171,7 +171,6 @@ jobs:
         if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
         run: |
           ECR_URL=$(terraform -chdir=terraform/environments/dev output -raw  ecr_repository_url)
-          docker push $ECR_URL:$GITHUB_RUN_ID
           docker push $ECR_URL:latest
 
 
