@@ -1,9 +1,11 @@
 resource "aws_launch_configuration" "ecs_launch_config" {
-  name_prefix                 = var.env
-  image_id                    = var.instance_ami
-  iam_instance_profile        = aws_iam_instance_profile.ecs_agent.name
-  security_groups             = [aws_security_group.ecs_sg.id]
-  user_data                   = file("${path.module}/files/register-cluster.sh")
+  name_prefix          = var.env
+  image_id             = var.instance_ami
+  iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
+  security_groups      = [aws_security_group.ecs_sg.id]
+  user_data = templatefile("${path.module}/files/register-cluster.sh.tftpl", {
+    cluster_name = aws_ecs_cluster.ecs_cluster.name
+  })
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.generated_key.key_name
   spot_price                  = var.instance_spot_price
