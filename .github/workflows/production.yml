@@ -1,9 +1,8 @@
 name: "Production"
 
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+
 jobs:
   terraform:
     environment: production
@@ -42,7 +41,6 @@ jobs:
 
       - name: Terraform Apply (Prod)
         working-directory: terraform/environments/prod
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           OPEN_WEATHER_TOKEN: ${{ secrets.OPEN_WEATHER_TOKEN }}
@@ -101,7 +99,6 @@ jobs:
           zip -r dist.zip ./dist
 
       - name: Upload to S3
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
           BUCKET=$(terraform -chdir=terraform/environments/prod output -raw  s3_lambda_bucket)
           BUCKET_KEY=$(terraform -chdir=terraform/environments/prod output -raw  s3_lambda_bucket_key)
@@ -161,7 +158,6 @@ jobs:
           docker build -t $ECR_URL:$GITHUB_RUN_ID -t $ECR_URL:latest ./sunset-recorder
 
       - name: Push image to Amazon ECR
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
           ECR_URL=$(terraform -chdir=terraform/environments/prod output -raw  ecr_repository_url)
           docker push $ECR_URL:latest
