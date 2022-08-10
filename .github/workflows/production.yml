@@ -78,7 +78,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-3
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -121,8 +121,7 @@ jobs:
           BUCKET=$(terraform -chdir=terraform/environments/prod output -raw  s3_lambda_bucket)
           BUCKET_KEY=$(terraform -chdir=terraform/environments/prod output -raw  s3_lambda_bucket_key)
           NAME=$(terraform -chdir=terraform/environments/prod output -raw  lambda_name)
-          aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $BUCKET_KEY
-          aws lambda publish-version --function-name $NAME
+          aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $BUCKET_KEY --publish > /dev/null  
   
 
   recorder-service:
