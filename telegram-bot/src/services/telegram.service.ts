@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from "@nestjs/common";
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -9,6 +9,8 @@ import {
 @Injectable()
 export class TelegramService {
   private readonly telegramConfig: TelegramConfig;
+
+  private readonly logger = new Logger(TelegramService.name);
 
   constructor(
     private readonly httpService: HttpService,
@@ -21,7 +23,8 @@ export class TelegramService {
     caption: string;
     videoUrl: string;
   }): Promise<void> => {
-    console.log(params.videoUrl);
+    this.logger.debug("Send video to chat");
+
     await this.sendRequest('sendVideo', {
       caption: params.caption,
       video: params.videoUrl,
@@ -35,6 +38,8 @@ export class TelegramService {
     protect_content?: string;
     allows_multiple_answers?: boolean;
   }): Promise<{ messageId: string }> => {
+    this.logger.debug("Send poll to chat");
+
     const data = await this.sendRequest<{ result: { message_id } }>(
       'sendPoll',
       {

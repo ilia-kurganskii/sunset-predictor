@@ -11,7 +11,7 @@ import {
   ConfigurationVariables,
 } from '../config/configuration.model';
 import { Place } from '../models/place.model';
-import { v4 as uuid } from 'uuid';
+import { RecordItem } from '../models/record.model';
 
 @Injectable()
 export class AWSService {
@@ -40,14 +40,17 @@ export class AWSService {
   }
 
   async getSignedUrlForFile(file: string): Promise<string> {
+    this.logger.debug(`Get signed url for file ${file}`);
     const command = new GetObjectCommand({
-      Bucket: this.awsConfig.region,
+      Bucket: this.awsConfig.bucketRecordsName,
       Key: file,
     });
     return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
   }
 
-  async putItemToRecordTable<T>(item: T) {
+  async putItemToRecordTable(item: RecordItem) {
+    this.logger.debug(`Put item to record table recordId: ${item.recordId}`);
+
     return this.dynamoDbClient.put({
       TableName: this.awsConfig.dynamoDbRecordsName,
       Item: item,
@@ -92,7 +95,7 @@ export class AWSService {
     streamUrl: string;
   }): Promise<{ taskDefinitionArn: string }> {
     let { placeId, streamUrl } = params;
-    this.logger.debug("Create task definition")
+    this.logger.debug('Create task definition');
     const result = await this.ecsClient.registerTaskDefinition({
       family: `${placeId}_sunset-recorder`,
       containerDefinitions: [
@@ -123,7 +126,6 @@ export class AWSService {
             },
             { name: 'AWS_DEFAULT_REGION', value: this.awsConfig.region },
           ],
-
         },
       ],
     });
@@ -136,7 +138,7 @@ export class AWSService {
     ruleName: string;
   }) {
     let { placeId, taskDefinitionArn, ruleName } = params;
-    this.logger.debug(`Set rule(${ruleName}) targets: ${taskDefinitionArn} `)
+    this.logger.debug(`Set rule(${ruleName}) targets: ${taskDefinitionArn} `);
     await this.eventBridgeClient.putTargets({
       Rule: ruleName,
       Targets: [

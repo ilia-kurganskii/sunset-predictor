@@ -40,20 +40,22 @@ export class AppController {
   };
 
   private onVideoRecoded = async (event: VideoRecordedEvent): Promise<void> => {
-    let { file, place_id, type } = event;
+    let { file, place_id } = event;
     const url = await this.awsService.getSignedUrlForFile(file);
-    await this.awsService.putItemToRecordTable({
-      id: place_id,
-      recordedFileKey: file,
-    });
+
     await this.telegramService.sendVideo({
       caption: 'Sunset',
       videoUrl: url,
     });
-    await this.telegramService.sendPoll({
+    const { messageId } = await this.telegramService.sendPoll({
       question: 'Rate the sunset^',
       options: ['5', '4', '3', '2', '1', 'Colored clouds', 'Clean horizons'],
       allows_multiple_answers: true,
+    });
+    await this.awsService.putItemToRecordTable({
+      recordId: place_id + file,
+      videoKey: file,
+      messageId: messageId,
     });
   };
 
@@ -78,7 +80,7 @@ export class AppController {
       lon,
     });
 
-    const sunsetUtcDate = new Date(weather.sunset*1000);
+    const sunsetUtcDate = new Date(weather.sunset * 1000);
 
     const { ruleName } = await this.awsService.createRecorderRule({
       placeId: item.id,

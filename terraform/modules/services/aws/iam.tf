@@ -32,6 +32,25 @@ resource "aws_iam_policy" "lambda_access_resources_policy" {
       {
         "Effect" : "Allow",
         "Action" : [
+          "dynamodb:*"
+        ],
+        "Resource" : [
+          aws_dynamodb_table.records.arn,
+          aws_dynamodb_table.predictions.arn,
+          aws_dynamodb_table.records.arn,
+        ]
+        }, {
+        "Effect" : "Allow",
+        "Action" : [
+          "events:*"
+        ],
+        "Resource" : [
+          "*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"

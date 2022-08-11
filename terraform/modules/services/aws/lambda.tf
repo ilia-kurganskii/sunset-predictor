@@ -34,8 +34,7 @@ resource "aws_lambda_function" "telegram_bot" {
 }
 
 resource "aws_cloudwatch_log_group" "telegram_bot" {
-  name = "/aws/lambda/${aws_lambda_function.telegram_bot.function_name}"
-
+  name              = "/aws/lambda/${aws_lambda_function.telegram_bot.function_name}"
   retention_in_days = 30
 }
 
