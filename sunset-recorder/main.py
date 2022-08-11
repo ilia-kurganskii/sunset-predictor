@@ -22,11 +22,11 @@ def environ_or_default(key, default):
 
 
 parser = argparse.ArgumentParser(description='Record and deploy stream to S3 bucket')
-parser.add_argument('--input-url',
+parser.add_argument('--stream-url',
                     type=str,
-                    dest='input_url',
+                    dest='stream_url',
                     help='input stream URL like http://example.com/video.m3u8',
-                    **environ_or_required('INPUT_URL'))
+                    **environ_or_required('STREAM_URL'))
 
 parser.add_argument('--duration',
                     type=str,
@@ -61,7 +61,7 @@ args = parser.parse_args()
 # Save video stream to file
 print("Start record stream...")
 subprocess.run(["/usr/local/bin/ffmpeg",
-                        "-i", args.input_url,
+                        "-i", args.stream_url,
                          "-t", args.duration,
                          "-vcodec", "libx265", # CODEC
                          "-crf", "23", # QUALITY
