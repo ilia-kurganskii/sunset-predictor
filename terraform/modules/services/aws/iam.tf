@@ -27,7 +27,7 @@ resource "aws_iam_policy" "lambda_access_resources_policy" {
           "s3:GetObject",
         ]
         Effect   = "Allow"
-        Resource = [var.bucket_records_arn, "${var.bucket_records_arn}/*"]
+        Resource = ["${aws_s3_bucket.records.arn}/*"]
       },
       {
         "Effect" : "Allow",

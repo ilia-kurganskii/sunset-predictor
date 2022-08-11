@@ -1,4 +1,4 @@
-resource "aws_iam_role" "scheduled_task_cloudwatch" {
+resource "aws_iam_role" "scheduled_task" {
   name = "${var.env}_scheduled_task_cloudwatch"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
@@ -15,9 +15,9 @@ resource "aws_iam_role" "scheduled_task_cloudwatch" {
   })
 }
 
-resource "aws_iam_role_policy" "scheduled_task_cloudwatch_policy" {
+resource "aws_iam_role_policy" "scheduled_task" {
   name = "${var.env}_scheduled_task_cloudwatch_policy"
-  role = aws_iam_role.scheduled_task_cloudwatch.id
+  role = aws_iam_role.scheduled_task.id
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [

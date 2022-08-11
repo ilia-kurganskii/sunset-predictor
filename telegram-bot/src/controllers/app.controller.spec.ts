@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
-import { TelegramService } from './telegram.service';
-import { AWSService } from './aws.service';
+import { TelegramService } from '../services/telegram.service';
+import { AWSService } from '../services/aws.service';
 
 describe('AppController', () => {
   let appController: AppController;

@@ -8,14 +8,14 @@ resource "aws_dynamodb_table" "records" {
   hash_key = "recordId"
 }
 
-resource "aws_dynamodb_table" "polls" {
+resource "aws_dynamodb_table" "places" {
   billing_mode = "PAY_PER_REQUEST"
-  name         = "${var.env}_polls"
+  name         = "${var.env}_places"
   attribute {
-    name = "pollId"
+    name = "id"
     type = "S"
   }
-  hash_key = "pollId"
+  hash_key = "id"
 }
 
 resource "aws_dynamodb_table" "predictions" {

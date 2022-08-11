@@ -31,3 +31,15 @@ variable "env" {
   type        = string
   description = "Environment"
 }
+
+variable "telegram_token" {
+  type = string
+}
+
+variable "telegram_chat_id" {
+  type = string
+}
+
+variable "open_weather_token" {
+  type = string
+}
