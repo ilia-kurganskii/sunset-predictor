@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { GetObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { DynamoDB } from '@aws-sdk/client-dynamodb';
@@ -11,10 +11,13 @@ import {
   ConfigurationVariables,
 } from '../config/configuration.model';
 import { Place } from '../models/place.model';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AWSService {
   private readonly awsConfig: AWSConfig;
+
+  private readonly logger = new Logger(AWSService.name);
 
   private readonly s3Client: S3;
   private readonly dynamoDbClient: DynamoDBDocument;
@@ -51,16 +54,13 @@ export class AWSService {
     });
   }
 
-  async putItemToPlaceTable(item: Omit<Place, 'id'>): Promise<Place> {
-    const id = `${item.lat}${item.lon}`;
-    const result = await this.dynamoDbClient.put({
+  async putItemToPlaceTable(item: Place): Promise<Place> {
+    this.logger.debug(`Add item to place table with id ${item.id}`);
+    await this.dynamoDbClient.put({
       TableName: this.awsConfig.dynamoDbPlaceName,
-      Item: {
-        id,
-        ...item,
-      },
+      Item: item,
     });
-    return result.Attributes as Place;
+    return item;
   }
 
   async createRecorderRule(params: {
@@ -70,6 +70,10 @@ export class AWSService {
   }): Promise<{ ruleName: string }> {
     let { hourUtc, minUtc, placeId } = params;
     const ruleName = placeId;
+    const cronTime = `cron(${minUtc} ${hourUtc} * * ? *)`;
+    this.logger.debug(
+      `Create recorder rule (${cronTime}) with name ${ruleName}`,
+    );
     await this.eventBridgeClient.putRule({
       Name: placeId,
       Description: `Rule to record sunset for placeId: ${placeId}`,
@@ -88,14 +92,15 @@ export class AWSService {
     streamUrl: string;
   }): Promise<{ taskDefinitionArn: string }> {
     let { placeId, streamUrl } = params;
+    this.logger.debug("Create task definition")
     const result = await this.ecsClient.registerTaskDefinition({
-      family: 'recorder',
+      family: `${placeId}_sunset-recorder`,
       containerDefinitions: [
         {
           image: `${this.awsConfig.repositoryRecorderUrl}:latest`,
           essential: true,
           memory: 300,
-          name: `${placeId}-sunset-recorder`,
+          name: `${placeId}_sunset-recorder`,
           cpu: 500,
           logConfiguration: {
             logDriver: 'awslogs',
@@ -108,16 +113,17 @@ export class AWSService {
           },
           environment: [
             { name: 'DURATION', value: '20' },
-            { name: 'TIMELAPSE_FACTOR', value: '0.016' },
+            { name: 'TIMELAPSE_FACTOR', value: "1" },
             { name: 'PLACE_ID', value: placeId },
             { name: 'STREAM_URL', value: streamUrl },
-            { name: 'AWS_BUCKET', value: this.awsConfig.ecsTaskRecordsRoleArn },
+            { name: 'AWS_BUCKET', value: this.awsConfig.bucketRecordsName },
             {
               name: 'AWS_LAMBDA_NAME',
               value: this.awsConfig.lambdaTelegramBotFunctionName,
             },
             { name: 'AWS_DEFAULT_REGION', value: this.awsConfig.region },
           ],
+
         },
       ],
     });
@@ -130,6 +136,7 @@ export class AWSService {
     ruleName: string;
   }) {
     let { placeId, taskDefinitionArn, ruleName } = params;
+    this.logger.debug(`Set rule(${ruleName}) targets: ${taskDefinitionArn} `)
     await this.eventBridgeClient.putTargets({
       Rule: ruleName,
       Targets: [

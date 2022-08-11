@@ -9,7 +9,11 @@ import { WeatherService } from './services/weather.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [config] }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config],
+      envFilePath: '.env',
+    }),
     HttpModule,
   ],
   controllers: [AppController],

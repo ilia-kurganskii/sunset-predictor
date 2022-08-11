@@ -43,3 +43,8 @@ variable "telegram_chat_id" {
 variable "open_weather_token" {
   type = string
 }
+
+variable "force_destroy" {
+  type    = bool
+  default = null
+}

@@ -12,6 +12,7 @@ export interface VideoRecordedEvent {
 
 export interface AddPlaceEvent {
   type: EventType.ADD_PLACE;
+  id: string;
   name: string;
   lat: string;
   lon: string;

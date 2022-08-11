@@ -1,8 +1,9 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { FastifyAdapter } from '@nestjs/platform-fastify';
-import { Callback, Context, Handler } from 'aws-lambda';
-import { AppController } from './controllers/app.controller';
+import { NestFactory } from "@nestjs/core";
+import { AppModule } from "./app.module";
+import { FastifyAdapter } from "@nestjs/platform-fastify";
+import { Callback, Context, Handler } from "aws-lambda";
+import { AppController } from "./controllers/app.controller";
+import { AppEvent, EventType } from "./models/event.model";
 
 let cachedHandler: AppController;
 
@@ -16,9 +17,9 @@ async function bootstrapServer(): Promise<AppController> {
 }
 
 export const handler: Handler = async (
-  event: any,
+  event: AppEvent,
   context: Context,
-  callback: Callback,
+  callback: Callback
 ) => {
   const handler = await bootstrapServer();
   return handler.processEvent(event, context, callback);

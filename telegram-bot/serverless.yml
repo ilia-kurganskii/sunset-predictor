@@ -11,12 +11,7 @@ provider:
 functions:
   main:
     handler: dist/main.handler
-    environment:
-      TELEGRAM_TOKEN: ${env:TELEGRAM_TOKEN}
-      AWS_RECORDS_BUCKET: ${env:AWS_RECORDS_BUCKET}
-      AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${env:AWS_SECRET_ACCESS_KEY}
     events:
-      - http:
+      - eventBridge:
           method: ANY
           path: /

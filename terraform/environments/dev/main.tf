@@ -8,6 +8,7 @@ module "aws_infra" {
   instance_type       = "t3.nano"
   instance_ami        = "ami-040d909ea4e56f8f3"
   instance_spot_price = "0.0017"
+  force_destroy       = true
   aws_region          = local.aws_region
   env                 = local.env
   open_weather_token  = var.open_weather_token

@@ -58,8 +58,10 @@ export class AppController {
   };
 
   private onAddPlace = async (event: AddPlaceEvent): Promise<void> => {
-    let { name, lat, lon, stream_url } = event;
+    let { name, id, lat, lon, stream_url } = event;
+
     const item = await this.awsService.putItemToPlaceTable({
+      id,
       name,
       lat,
       lon,
@@ -76,7 +78,7 @@ export class AppController {
       lon,
     });
 
-    const sunsetUtcDate = new Date(weather.sunset);
+    const sunsetUtcDate = new Date(weather.sunset*1000);
 
     const { ruleName } = await this.awsService.createRecorderRule({
       placeId: item.id,
