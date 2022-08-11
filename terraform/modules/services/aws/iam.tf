@@ -35,7 +35,7 @@ resource "aws_iam_policy" "lambda_access_resources_policy" {
           "dynamodb:*"
         ],
         "Resource" : [
-          aws_dynamodb_table.records.arn,
+          aws_dynamodb_table.places.arn,
           aws_dynamodb_table.predictions.arn,
           aws_dynamodb_table.records.arn,
         ]
@@ -47,6 +47,20 @@ resource "aws_iam_policy" "lambda_access_resources_policy" {
         "Resource" : [
           "*"
         ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ecs:RegisterTaskDefinition"
+        ],
+        "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "iam:PassRole"
+        ],
+        "Resource" : aws_iam_role.scheduled_task.arn
       },
       {
         "Effect" : "Allow",
