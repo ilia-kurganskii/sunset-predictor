@@ -12,7 +12,8 @@ export interface AWSConfig {
   clusterArn: string;
   repositoryRecorderUrl: string;
   lambdaTelegramBotFunctionName: string;
-  ecsTaskRecordsRoleArn: string
+  ecsExecutionRoleArn: string
+  ecsTaskRoleArn: string
   eventBridgeRuleRoleArn: string
 }
 

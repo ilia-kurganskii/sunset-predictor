@@ -1,27 +1,45 @@
-data "aws_iam_policy_document" "ecs_execution_role" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
-    }
-  }
-}
-
-resource "aws_iam_role" "ecs_agent" {
-  name               = "${var.env}_ecs-agent"
-  assume_role_policy = data.aws_iam_policy_document.ecs_execution_role.json
+resource "aws_iam_role" "ecs_execution" {
+  name = "${var.env}_ecs_execution"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : "sts:AssumeRole",
+        "Principal" : {
+          "Service" : "ecs-tasks.amazonaws.com"
+        },
+        "Effect" : "Allow",
+        "Sid" : ""
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerServiceforEC2Role" {
-  role       = aws_iam_role.ecs_agent.name
+  role       = aws_iam_role.ecs_execution.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
-resource "aws_iam_role_policy" "ecs_agent_policy" {
+resource "aws_iam_role" "ecs_task" {
+  name = "${var.env}_ecs_task"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : "sts:AssumeRole",
+        "Principal" : {
+          "Service" : "ecs-tasks.amazonaws.com"
+        },
+        "Effect" : "Allow",
+        "Sid" : ""
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "task_role_policy" {
   name = "${var.env}_ecs_agent"
-  role = aws_iam_role.ecs_agent.id
+  role = aws_iam_role.ecs_task.id
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -71,10 +89,4 @@ resource "aws_iam_role_policy" "ecs_agent_policy" {
       }
     ]
   })
-}
-
-
-resource "aws_iam_instance_profile" "ecs_agent" {
-  name = "${var.env}_ecs-agent"
-  role = aws_iam_role.ecs_agent.name
 }

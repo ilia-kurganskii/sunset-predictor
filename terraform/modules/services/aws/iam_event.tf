@@ -1,5 +1,5 @@
-resource "aws_iam_role" "scheduled_task" {
-  name = "${var.env}_scheduled_task_cloudwatch"
+resource "aws_iam_role" "event_execution" {
+  name = "${var.env}_event_execution"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -15,9 +15,9 @@ resource "aws_iam_role" "scheduled_task" {
   })
 }
 
-resource "aws_iam_role_policy" "scheduled_task" {
-  name = "${var.env}_scheduled_task_cloudwatch_policy"
-  role = aws_iam_role.scheduled_task.id
+resource "aws_iam_role_policy" "event_execution" {
+  name = "${var.env}_event_execution_policy"
+  role = aws_iam_role.ecs_execution.id
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [

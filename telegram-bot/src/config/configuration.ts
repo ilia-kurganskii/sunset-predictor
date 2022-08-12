@@ -1,7 +1,7 @@
 import { ConfigurationVariables } from './configuration.model';
-import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+import * as dotenv from 'dotenv'; // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 
-dotenv.config()
+dotenv.config();
 
 const configuration: ConfigurationVariables = {
   aws: {
@@ -13,8 +13,9 @@ const configuration: ConfigurationVariables = {
     repositoryRecorderUrl: process.env.AWS_REPOSITORY_RECORDER_URL,
     lambdaTelegramBotFunctionName:
       process.env.AWS_LAMBDA_TELEGRAM_BOT_FUNC_NAME,
-    ecsTaskRecordsRoleArn: process.env.AWS_TASK_RECORDS_ROLE_ARN,
-    eventBridgeRuleRoleArn: process.env.AWS_EVENT_BRIDGE_ROLE_ARN,
+    ecsExecutionRoleArn: process.env.AWS_ECS_EXECUTION_ROLE_ARN,
+    ecsTaskRoleArn: process.env.AWS_ECS_TASK_ROLE_ARN,
+    eventBridgeRuleRoleArn: process.env.AWS_EVENT_EXECUTION_ROLE_ARN,
   },
   telegram: {
     token: process.env.TELEGRAM_TOKEN,
