@@ -77,6 +77,14 @@ export class AWSService {
     return result.Item as Place;
   }
 
+  async getAllPlaces(): Promise<Place[]> {
+    this.logger.debug(`Get all places"`);
+    const result = await this.dynamoDbClient.scan({
+      TableName: this.awsConfig.dynamoDbPlaceName,
+    });
+    return result.Items as Place[];
+  }
+
   async setRecorderRule(params: {
     placeId: string;
     minUtc: number;
@@ -107,6 +115,8 @@ export class AWSService {
     this.logger.debug('Create task definition');
     const result = await this.ecsClient.registerTaskDefinition({
       family: `${placeId}_sunset-recorder`,
+      requiresCompatibilities: ['FARGATE'],
+      executionRoleArn: this.awsConfig.ecsTaskRecordsRoleArn,
       containerDefinitions: [
         {
           image: `${this.awsConfig.repositoryRecorderUrl}:latest`,

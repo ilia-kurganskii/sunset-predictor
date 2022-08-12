@@ -25,7 +25,7 @@ resource "aws_lambda_function" "telegram_bot" {
       AWS_DYNAMO_DB_RECORDS_TABLE_NAME  = aws_dynamodb_table.records.name
       AWS_REPOSITORY_RECORDER_URL       = aws_ecr_repository.sunset_recorder.repository_url
       AWS_LAMBDA_TELEGRAM_BOT_FUNC_NAME = "${var.env}_telegram_bot"
-      AWS_TASK_RECORDS_ROLE_ARN         = aws_iam_role.scheduled_task.arn
+      AWS_TASK_RECORDS_ROLE_ARN         = aws_iam_role.ecs_agent.arn
       AWS_EVENT_BRIDGE_ROLE_ARN         = aws_iam_role.scheduled_task.arn
       OPEN_WEATHER_TOKEN                = var.open_weather_token
 

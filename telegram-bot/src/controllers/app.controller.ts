@@ -5,6 +5,7 @@ import {
   AddPlaceEvent,
   AppEvent,
   EventType,
+  UpdateAllSchedule,
   VideoRecordedEvent,
 } from '../models/event.model';
 import { PlaceService } from '../services/place.service';
@@ -33,6 +34,11 @@ export class AppController {
 
         case EventType.ADD_PLACE:
           await this.onAddPlace(event);
+          break;
+
+        case EventType.UPDATE_ALL_SCHEDULE:
+          await this.onRefreshAllSchedule(event);
+          break;
       }
       callback(null, 'success');
     } catch (e) {
@@ -66,5 +72,16 @@ export class AppController {
       lon,
       streamUrl: stream_url,
     });
+  };
+
+  private onRefreshAllSchedule = async (
+    event: UpdateAllSchedule,
+  ): Promise<void> => {
+    const places = await this.placeService.getAllPlaces();
+    await Promise.all(
+      places.map((place) => {
+        this.placeService.refreshTimeForPlace(place.id);
+      }),
+    );
   };
 }

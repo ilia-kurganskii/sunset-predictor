@@ -19,4 +19,8 @@ export interface AddPlaceEvent {
   stream_url: string;
 }
 
-export type AppEvent = VideoRecordedEvent | AddPlaceEvent;
+export interface UpdateAllSchedule {
+  type: EventType.UPDATE_ALL_SCHEDULE;
+}
+
+export type AppEvent = VideoRecordedEvent | AddPlaceEvent | UpdateAllSchedule;

@@ -55,6 +55,11 @@ export class PlaceService {
     return this.awsService.getPlaceById(placeId);
   }
 
+  async getAllPlaces(): Promise<Place[]> {
+    this.logger.debug(`Get all places`);
+    return this.awsService.getAllPlaces();
+  }
+
   private async updateScheduleTimeForPlaceRule(
     placeId: string,
     sunsetTimestamp: number,
