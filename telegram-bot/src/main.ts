@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Callback, Context, Handler } from 'aws-lambda';
 import { AppController } from './controllers/app.controller';
-import { AppEvent, EventType } from './models/event.model';
+import { AppEvent } from './models/event.model';
 
 let cachedHandler: AppController;
 
@@ -27,12 +27,7 @@ export const handler: Handler = async (
 
 handler(
   {
-    id: 'hague-zeilvereniging',
-    type: 'add_place',
-    name: 'Zeilvereniging Noordwijk',
-    lat: '52.2438376',
-    lon: '4.4241582',
-    stream_url: 'http://webcam.zvnoordwijk.nl:82/mjpg/video.mjpg',
+    type: 'regenerate_places',
   },
   null,
   () => undefined,

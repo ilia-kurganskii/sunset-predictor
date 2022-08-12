@@ -7,14 +7,16 @@ export interface ConfigurationVariables {
 export interface AWSConfig {
   region: string;
   bucketRecordsName: string;
-  dynamoDbRecordsName:string;
-  dynamoDbPlaceName:string;
+  dynamoDbRecordsName: string;
+  dynamoDbPlaceName: string;
   clusterArn: string;
   repositoryRecorderUrl: string;
   lambdaTelegramBotFunctionName: string;
-  ecsExecutionRoleArn: string
-  ecsTaskRoleArn: string
-  eventBridgeRuleRoleArn: string
+  ecsExecutionRoleArn: string;
+  ecsTaskRoleArn: string;
+  eventBridgeRuleRoleArn: string;
+  securityGroupArn: string;
+  subnetArn: string;
 }
 
 export interface TelegramConfig {

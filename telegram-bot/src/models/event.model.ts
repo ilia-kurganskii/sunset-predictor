@@ -2,6 +2,7 @@ export enum EventType {
   VIDEO_RECORDED = 'video_recorded',
   ADD_PLACE = 'add_place',
   UPDATE_ALL_SCHEDULE = 'update_all_schedule',
+  REGENERATE_PLACES = 'regenerate_places',
 }
 
 export interface VideoRecordedEvent {
@@ -23,4 +24,12 @@ export interface UpdateAllSchedule {
   type: EventType.UPDATE_ALL_SCHEDULE;
 }
 
-export type AppEvent = VideoRecordedEvent | AddPlaceEvent | UpdateAllSchedule;
+export interface RegeneratePlaces {
+  type: EventType.REGENERATE_PLACES;
+}
+
+export type AppEvent =
+  | VideoRecordedEvent
+  | AddPlaceEvent
+  | UpdateAllSchedule
+  | RegeneratePlaces;

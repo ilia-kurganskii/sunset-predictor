@@ -16,6 +16,8 @@ const configuration: ConfigurationVariables = {
     ecsExecutionRoleArn: process.env.AWS_ECS_EXECUTION_ROLE_ARN,
     ecsTaskRoleArn: process.env.AWS_ECS_TASK_ROLE_ARN,
     eventBridgeRuleRoleArn: process.env.AWS_EVENT_EXECUTION_ROLE_ARN,
+    securityGroupArn: process.env.AWS_SECURITY_GROUP_ARN,
+    subnetArn: process.env.AWS_SUBNET_ARN,
   },
   telegram: {
     token: process.env.TELEGRAM_TOKEN,

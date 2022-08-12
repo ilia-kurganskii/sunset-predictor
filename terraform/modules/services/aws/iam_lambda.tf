@@ -60,7 +60,7 @@ resource "aws_iam_policy" "lambda_access_resources_policy" {
         "Action" : [
           "iam:PassRole"
         ],
-        "Resource" : [aws_iam_role.event_execution.arn, aws_iam_role.ecs_execution.arn]
+        "Resource" : [aws_iam_role.event_execution.arn, aws_iam_role.ecs_execution.arn, aws_iam_role.ecs_task.arn]
       },
       {
         "Effect" : "Allow",

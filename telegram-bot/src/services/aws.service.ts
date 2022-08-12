@@ -169,7 +169,15 @@ export class AWSService {
           Arn: this.awsConfig.clusterArn,
           RoleArn: this.awsConfig.eventBridgeRuleRoleArn,
           EcsParameters: {
+            LaunchType: 'FARGATE',
             TaskDefinitionArn: taskDefinitionArn,
+            NetworkConfiguration: {
+              awsvpcConfiguration: {
+                AssignPublicIp: 'DISABLED',
+                Subnets: [this.awsConfig.subnetArn],
+                SecurityGroups: [this.awsConfig.securityGroupArn],
+              },
+            },
           },
         },
       ],

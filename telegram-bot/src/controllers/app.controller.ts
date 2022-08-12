@@ -4,10 +4,10 @@ import { AWSService } from '../services/aws.service';
 import {
   AddPlaceEvent,
   AppEvent,
-  EventType,
+  EventType, RegeneratePlaces,
   UpdateAllSchedule,
-  VideoRecordedEvent,
-} from '../models/event.model';
+  VideoRecordedEvent
+} from "../models/event.model";
 import { PlaceService } from '../services/place.service';
 import { NotificationService } from '../services/notification.service';
 import { RecordsService } from '../services/records.service';
@@ -38,6 +38,10 @@ export class AppController {
 
         case EventType.UPDATE_ALL_SCHEDULE:
           await this.onRefreshAllSchedule(event);
+          break;
+
+          case EventType.REGENERATE_PLACES:
+          await this.onRegeneratePlaces(event);
           break;
       }
       callback(null, 'success');
@@ -81,6 +85,17 @@ export class AppController {
     await Promise.all(
       places.map((place) => {
         this.placeService.refreshTimeForPlace(place.id);
+      }),
+    );
+  };
+
+  private onRegeneratePlaces = async (
+    event: RegeneratePlaces,
+  ): Promise<void> => {
+    const places = await this.placeService.getAllPlaces();
+    await Promise.all(
+      places.map((place) => {
+        this.placeService.createPlace(place);
       }),
     );
   };
