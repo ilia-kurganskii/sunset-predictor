@@ -116,7 +116,6 @@ jobs:
           aws s3 cp ./telegram-bot/dist.zip s3://$BUCKET/$BUCKET_KEY
 
       - name: Update function
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: |
           BUCKET=$(terraform -chdir=terraform/environments/prod output -raw  s3_lambda_bucket)
           BUCKET_KEY=$(terraform -chdir=terraform/environments/prod output -raw  s3_lambda_bucket_key)
