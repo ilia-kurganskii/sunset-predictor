@@ -35,6 +35,13 @@ parser.add_argument('--duration',
                     help='duration of result video',
                     **environ_or_required('DURATION'))
 
+parser.add_argument('--place-id',
+                    type=str,
+                    dest='place_id',
+                    metavar='ID',
+                    help='place id',
+                    **environ_or_required('PLACE_ID'))
+
 parser.add_argument('--aws-bucket',
                     type=str,
                     dest='aws_bucket',
@@ -99,7 +106,7 @@ lambdaClient = boto3.client('lambda')
 lambdaClient.invoke(
     FunctionName=args.lambda_name,
     InvocationType='Event',
-    Payload=json.dumps({ "type" : "video_recorded", "file" : video_file_key}),
+    Payload=json.dumps({ "type" : "video_recorded", "file" : video_file_key, "place_id": args.place_id}),
 )
 
 print("Finish all tasks")

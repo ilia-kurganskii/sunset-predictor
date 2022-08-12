@@ -6,6 +6,9 @@ import { HttpModule } from '@nestjs/axios';
 import config from './config/configuration';
 import { ConfigModule } from '@nestjs/config';
 import { WeatherService } from './services/weather.service';
+import { NotificationService } from './services/notification.service';
+import { PlaceService } from './services/place.service';
+import { RecordsService } from './services/records.service';
 
 @Module({
   imports: [
@@ -17,6 +20,13 @@ import { WeatherService } from './services/weather.service';
     HttpModule,
   ],
   controllers: [AppController],
-  providers: [TelegramService, AWSService, WeatherService],
+  providers: [
+    TelegramService,
+    NotificationService,
+    PlaceService,
+    RecordsService,
+    AWSService,
+    WeatherService,
+  ],
 })
 export class AppModule {}

@@ -1,5 +1,4 @@
 import { Controller } from '@nestjs/common';
-import { TelegramService } from '../services/telegram.service';
 import { Callback, Context } from 'aws-lambda';
 import { AWSService } from '../services/aws.service';
 import {
@@ -8,14 +7,17 @@ import {
   EventType,
   VideoRecordedEvent,
 } from '../models/event.model';
-import { WeatherService } from '../services/weather.service';
+import { PlaceService } from '../services/place.service';
+import { NotificationService } from '../services/notification.service';
+import { RecordsService } from '../services/records.service';
 
 @Controller()
 export class AppController {
   constructor(
-    public readonly telegramService: TelegramService,
+    public readonly notificationService: NotificationService,
     public readonly awsService: AWSService,
-    public readonly weatherService: WeatherService,
+    public readonly recordsService: RecordsService,
+    public readonly placeService: PlaceService,
   ) {}
 
   processEvent = async (
@@ -41,57 +43,28 @@ export class AppController {
 
   private onVideoRecoded = async (event: VideoRecordedEvent): Promise<void> => {
     let { file, place_id } = event;
-    const url = await this.awsService.getSignedUrlForFile(file);
-
-    await this.telegramService.sendVideo({
-      caption: 'Sunset',
-      videoUrl: url,
+    const place = await this.placeService.getPlaceById(place_id);
+    const { messageId } = await this.notificationService.notifyAboutNewVideo({
+      placeName: place.name,
+      file: file,
     });
-    const { messageId } = await this.telegramService.sendPoll({
-      question: 'Rate the sunset^',
-      options: ['5', '4', '3', '2', '1', 'Colored clouds', 'Clean horizons'],
-      allows_multiple_answers: true,
+    await this.recordsService.addNewRecord({
+      placeId: place_id,
+      file,
+      messageId,
     });
-    await this.awsService.putItemToRecordTable({
-      recordId: place_id + file,
-      videoKey: file,
-      messageId: messageId,
-    });
+    await this.placeService.refreshTimeForPlace(place_id);
   };
 
   private onAddPlace = async (event: AddPlaceEvent): Promise<void> => {
     let { name, id, lat, lon, stream_url } = event;
 
-    const item = await this.awsService.putItemToPlaceTable({
+    await this.placeService.createPlace({
       id,
       name,
       lat,
       lon,
       streamUrl: stream_url,
-    });
-
-    const { taskDefinitionArn } = await this.awsService.createTaskDefinition({
-      placeId: item.id,
-      streamUrl: stream_url,
-    });
-
-    const weather = await this.weatherService.getCurrentWeather({
-      lat,
-      lon,
-    });
-
-    const sunsetUtcDate = new Date(weather.sunset * 1000);
-
-    const { ruleName } = await this.awsService.createRecorderRule({
-      placeId: item.id,
-      hourUtc: sunsetUtcDate.getUTCHours(),
-      minUtc: sunsetUtcDate.getUTCMinutes(),
-    });
-
-    await this.awsService.setRuleTarget({
-      placeId: item.id,
-      ruleName,
-      taskDefinitionArn,
     });
   };
 }

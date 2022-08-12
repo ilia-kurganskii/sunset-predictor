@@ -66,7 +66,18 @@ export class AWSService {
     return item;
   }
 
-  async createRecorderRule(params: {
+  async getPlaceById(id: string): Promise<Place> {
+    this.logger.debug(`Get place by id "${id}"`);
+    const result = await this.dynamoDbClient.get({
+      TableName: this.awsConfig.dynamoDbPlaceName,
+      Key: {
+        id,
+      },
+    });
+    return result.Item as Place;
+  }
+
+  async setRecorderRule(params: {
     placeId: string;
     minUtc: number;
     hourUtc: number;
@@ -74,9 +85,7 @@ export class AWSService {
     let { hourUtc, minUtc, placeId } = params;
     const ruleName = placeId;
     const cronTime = `cron(${minUtc} ${hourUtc} * * ? *)`;
-    this.logger.debug(
-      `Create recorder rule (${cronTime}) with name ${ruleName}`,
-    );
+    this.logger.debug(`Set recorder rule (${cronTime}) with name ${ruleName}`);
     await this.eventBridgeClient.putRule({
       Name: placeId,
       Description: `Rule to record sunset for placeId: ${placeId}`,
@@ -116,7 +125,7 @@ export class AWSService {
           },
           environment: [
             { name: 'DURATION', value: '20' },
-            { name: 'TIMELAPSE_FACTOR', value: "0.016" },
+            { name: 'TIMELAPSE_FACTOR', value: '0.016' },
             { name: 'PLACE_ID', value: placeId },
             { name: 'STREAM_URL', value: streamUrl },
             { name: 'AWS_BUCKET', value: this.awsConfig.bucketRecordsName },
