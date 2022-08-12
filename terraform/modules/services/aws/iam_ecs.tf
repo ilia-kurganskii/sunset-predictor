@@ -1,17 +1,17 @@
-data "aws_iam_policy_document" "ecs_agent" {
+data "aws_iam_policy_document" "ecs_execution_role" {
   statement {
     actions = ["sts:AssumeRole"]
 
     principals {
       type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
+      identifiers = ["ecs-tasks.amazonaws.com"]
     }
   }
 }
 
 resource "aws_iam_role" "ecs_agent" {
   name               = "${var.env}_ecs-agent"
-  assume_role_policy = data.aws_iam_policy_document.ecs_agent.json
+  assume_role_policy = data.aws_iam_policy_document.ecs_execution_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerServiceforEC2Role" {

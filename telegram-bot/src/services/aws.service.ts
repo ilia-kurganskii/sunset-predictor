@@ -116,14 +116,16 @@ export class AWSService {
     const result = await this.ecsClient.registerTaskDefinition({
       family: `${placeId}_sunset-recorder`,
       requiresCompatibilities: ['FARGATE'],
+      networkMode: 'awsvpc',
+      cpu: '256',
+      memory: '512',
       executionRoleArn: this.awsConfig.ecsTaskRecordsRoleArn,
       containerDefinitions: [
         {
           image: `${this.awsConfig.repositoryRecorderUrl}:latest`,
           essential: true,
-          memory: 300,
           name: `${placeId}_sunset-recorder`,
-          cpu: 500,
+
           logConfiguration: {
             logDriver: 'awslogs',
             options: {
