@@ -181,6 +181,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - terraform
+      - telegram-bot
 
     steps:
       - name: Checkout
