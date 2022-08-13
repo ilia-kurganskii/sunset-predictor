@@ -1,0 +1,10 @@
+{
+  "id": "hague-zeilvereniging",
+  "type": "add_place",
+  "name": "Hague Zeilvereniging",
+  "start_offset": 23,
+  "duration": 30,
+  "lat": "52.2438376",
+  "lon": "4.4241582",
+  "stream_url": "http://webcam.zvnoordwijk.nl:82/mjpg/video.mjpg"
+}

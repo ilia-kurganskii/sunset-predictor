@@ -1,0 +1,10 @@
+{
+  "id": "hague-beach",
+  "type": "add_place",
+  "name": "Hague",
+  "start_offset": 23,
+  "duration": 30,
+  "lat": "52.117891",
+  "lon": "4.279861",
+  "stream_url": "https://59f185ece6219.streamlock.net/live/_definst_/sys2.stream/playlist.m3u8"
+}

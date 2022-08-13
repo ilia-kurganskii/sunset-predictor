@@ -207,7 +207,7 @@ jobs:
         working-directory: terraform/environments/prod
         run: terraform init
 
-      - name: Update function
+      - name: Add places
         run: |
           NAME=$(terraform -chdir=terraform/environments/prod output -raw  lambda_name)
-          sh ./telegram-bot/seed-production.sh $NAME
+          sh ./telegram-bot/seeds/seed-production.sh $NAME
