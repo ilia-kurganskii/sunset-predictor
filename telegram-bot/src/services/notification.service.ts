@@ -1,7 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Place } from '../models/place.model';
 import { AWSService } from './aws.service';
-import { getSunsetTime } from '../controllers/app.utils';
 import { WeatherService } from './weather.service';
 import { TelegramService } from './telegram.service';
 
@@ -20,6 +18,7 @@ export class NotificationService {
     placeName: string;
   }): Promise<{ messageId: string }> {
     let { file, placeName } = params;
+    this.logger.debug(`Notify about new video for place ${placeName}`)
     const url = await this.awsService.getSignedUrlForFile(file);
 
     await this.telegramService.sendVideo({
@@ -29,17 +28,10 @@ export class NotificationService {
     const { messageId } = await this.telegramService.sendPoll({
       question: `Rate the sunset in ${placeName}^`,
       options: [
-        'rate5: 5',
-        'rate4: 5',
-        'rate3: 3',
-        'rate2: 2',
-        'rate1: 1',
         'factor1: Colored clouds',
         'factor2: Clean horizons',
-        'factor3: TBD',
-        'factor4: TBD',
-        'factor5: TBD',
-        'factor6: TBD',
+        'factor3: Colored horizons',
+        'factor4: Colored sky',
       ],
       allows_multiple_answers: true,
     });
