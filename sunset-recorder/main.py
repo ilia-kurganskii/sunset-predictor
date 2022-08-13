@@ -95,7 +95,6 @@ subprocess.run(["/usr/local/bin/ffmpeg",
 print("Upload video to S3...")
 s3 = boto3.resource('s3')
 
-today_date_formatted = datetime.today().strftime('%Y-%m-%d')
 video_file_key = f'videos/video_{datetime.timestamp(datetime.now())}.mp4'
 data = open('output.mp4', 'rb')
 s3.Bucket(args.aws_bucket).put_object(Key=video_file_key, Body=data)

@@ -15,9 +15,36 @@ resource "aws_iam_role" "ecs_execution" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerServiceforEC2Role" {
-  role       = aws_iam_role.ecs_execution.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+resource "aws_iam_role_policy" "ecs_execution_policy" {
+  name = "${var.env}_ecs_execution"
+  role = aws_iam_role.ecs_execution.id
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ec2:DescribeTags",
+          "ecs:CreateCluster",
+          "ecs:DeregisterContainerInstance",
+          "ecs:DiscoverPollEndpoint",
+          "ecs:Poll",
+          "ecs:RegisterContainerInstance",
+          "ecs:StartTelemetrySession",
+          "ecs:UpdateContainerInstancesState",
+          "ecs:Submit*",
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "*"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role" "ecs_task" {

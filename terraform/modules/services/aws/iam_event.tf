@@ -1,5 +1,5 @@
 resource "aws_iam_role" "event_execution" {
-  name = "${var.env}_event_execution"
+  name               = "${var.env}_event_execution"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -15,9 +15,9 @@ resource "aws_iam_role" "event_execution" {
   })
 }
 
-resource "aws_iam_policy" "event_execution" {
-  name = "${var.env}_event_execution_policy"
-  path = "/"
+resource "aws_iam_role_policy" "event_execution" {
+  name   = "${var.env}_event_execution_policy"
+  role   = aws_iam_role.event_execution.id
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
@@ -43,9 +43,4 @@ resource "aws_iam_policy" "event_execution" {
       }
     ]
   })
-}
-
-resource "aws_iam_role_policy_attachment" "event_policy" {
-  role       = aws_iam_role.event_execution.name
-  policy_arn = aws_iam_policy.event_execution.arn
 }

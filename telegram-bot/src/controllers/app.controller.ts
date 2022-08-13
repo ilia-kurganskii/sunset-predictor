@@ -62,13 +62,13 @@ export class AppController {
   private onVideoRecoded = async (event: VideoRecordedEvent): Promise<void> => {
     let { file, place_id } = event;
     const place = await this.placeService.getPlaceById(place_id);
-    // const { messageId } = await this.notificationService.notifyAboutNewVideo({
-    //   placeName: place.name,
-    //   file: file,
-    // });
+    const { messageId } = await this.notificationService.notifyAboutNewVideo({
+      placeName: place.name,
+      file: file,
+    });
     await this.recordsService.addNewRecord({
       placeId: place_id,
-      messageId: "1",
+      messageId: messageId,
       lat: place.lat,
       lon: place.lon,
     });

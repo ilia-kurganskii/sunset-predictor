@@ -31,6 +31,7 @@ resource "aws_lambda_function" "telegram_bot" {
       AWS_SECURITY_GROUP_ARN            = aws_security_group.ecs_sg.id,
       AWS_SUBNET_ARN                    = aws_subnet.pub_subnet.id,
       OPEN_WEATHER_TOKEN                = var.open_weather_token
+      NO_COLOR                          = true
     }
   }
 }
