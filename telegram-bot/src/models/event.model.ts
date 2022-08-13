@@ -3,6 +3,7 @@ export enum EventType {
   ADD_PLACE = 'add_place',
   UPDATE_ALL_SCHEDULE = 'update_all_schedule',
   REGENERATE_PLACES = 'regenerate_places',
+  DELETE_PLACE = 'delete_place',
 }
 
 export interface VideoRecordedEvent {
@@ -17,6 +18,8 @@ export interface AddPlaceEvent {
   name: string;
   lat: string;
   lon: string;
+  start_offset: number;
+  duration: number;
   stream_url: string;
 }
 
@@ -28,8 +31,14 @@ export interface RegeneratePlaces {
   type: EventType.REGENERATE_PLACES;
 }
 
+export interface DeletePlace {
+  type: EventType.DELETE_PLACE;
+  place_id: string;
+}
+
 export type AppEvent =
   | VideoRecordedEvent
   | AddPlaceEvent
   | UpdateAllSchedule
+  | DeletePlace
   | RegeneratePlaces;

@@ -20,6 +20,7 @@ export class PlaceService {
     const { taskDefinitionArn } = await this.awsService.createTaskDefinition({
       placeId: item.id,
       streamUrl: item.streamUrl,
+      duration: item.duration
     });
 
     const weather = await this.weatherService.getCurrentWeather({
@@ -27,16 +28,31 @@ export class PlaceService {
       lon: item.lon,
     });
 
-    const { ruleName } = await this.updateScheduleTimeForPlaceRule(
-      item.id,
-      weather.sunset,
-    );
+    const { ruleName } = await this.updateScheduleTimeForPlaceRule({
+      placeId: item.id,
+      sunsetTimestamp: weather.sunset,
+      startOffset: place.startOffset,
+    });
 
     await this.awsService.setRuleTarget({
       placeId: item.id,
       ruleName,
       taskDefinitionArn,
     });
+  }
+
+  async deletePlace(placeId: string) {
+    this.logger.debug(`Delete place by id ${placeId}`);
+
+    await this.awsService.removeScheduleRule({ placeId });
+
+    await this.awsService.removeTaskDefinition({
+      placeId: placeId,
+    });
+
+    await this.awsService.deleteItemFromPlaceTable({ placeId });
+
+    this.logger.debug(`Delete place by id ${placeId} success`);
   }
 
   async refreshTimeForPlace(placeId: string) {
@@ -47,7 +63,11 @@ export class PlaceService {
       lat: place.lat,
       lon: place.lon,
     });
-    await this.updateScheduleTimeForPlaceRule(place.id, weather.sunset);
+    await this.updateScheduleTimeForPlaceRule({
+      placeId: placeId,
+      startOffset: place.startOffset,
+      sunsetTimestamp: weather.sunset,
+    });
   }
 
   async getPlaceById(placeId: string): Promise<Place> {
@@ -60,11 +80,13 @@ export class PlaceService {
     return this.awsService.getAllPlaces();
   }
 
-  private async updateScheduleTimeForPlaceRule(
-    placeId: string,
-    sunsetTimestamp: number,
-  ) {
-    const sunsetUtcDate = getSunsetTime(sunsetTimestamp);
+  private async updateScheduleTimeForPlaceRule(params: {
+    placeId: string;
+    startOffset: number;
+    sunsetTimestamp: number;
+  }) {
+    let { placeId, sunsetTimestamp, startOffset = 0 } = params;
+    const sunsetUtcDate = getSunsetTime(sunsetTimestamp - startOffset * 60);
 
     const { ruleName } = await this.awsService.setRecorderRule({
       placeId: placeId,

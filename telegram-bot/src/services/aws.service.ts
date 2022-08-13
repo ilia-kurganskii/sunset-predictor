@@ -48,6 +48,14 @@ export class AWSService {
     return await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
   }
 
+  async removeVideo(file: string): Promise<void> {
+    this.logger.debug(`Remove video for file ${file}`);
+    await this.s3Client.deleteObject({
+      Bucket: this.awsConfig.bucketRecordsName,
+      Key: file,
+    });
+  }
+
   async putItemToRecordTable(item: RecordItem) {
     this.logger.debug(`Put item to record table recordId: ${item.recordId}`);
 
@@ -64,6 +72,16 @@ export class AWSService {
       Item: item,
     });
     return item;
+  }
+
+  async deleteItemFromPlaceTable(params: { placeId: string }): Promise<void> {
+    this.logger.debug(`Remove item from place table with id ${params.placeId}`);
+    await this.dynamoDbClient.delete({
+      TableName: this.awsConfig.dynamoDbPlaceName,
+      Key: {
+        id: params.placeId,
+      },
+    });
   }
 
   async getPlaceById(id: string): Promise<Place> {
@@ -98,7 +116,7 @@ export class AWSService {
       Name: placeId,
       Description: `Rule to record sunset for placeId: ${placeId}`,
       RoleArn: this.awsConfig.eventBridgeRuleRoleArn,
-      ScheduleExpression: `cron(${minUtc} ${hourUtc} * * ? *)`,
+      ScheduleExpression: cronTime,
       State: 'ENABLED',
     });
 
@@ -107,14 +125,54 @@ export class AWSService {
     };
   }
 
+  async removeScheduleRule(params: { placeId: string }): Promise<void> {
+    const ruleName = params.placeId;
+    this.logger.debug(`Remove rule with name ${ruleName}`);
+    await this.removeTargetsForRule({ ruleName });
+    await this.eventBridgeClient.deleteRule({
+      Name: ruleName,
+    });
+  }
+
+  private async removeTargetsForRule(params: {
+    ruleName: string;
+  }): Promise<void> {
+    const ruleName = params.ruleName;
+    this.logger.debug(`Remove targets for rule ${ruleName}`);
+
+    const { Targets } = await this.eventBridgeClient.listTargetsByRule({
+      Rule: ruleName,
+    });
+
+    const targetIds = Targets.map((item) => item.Id);
+    await this.eventBridgeClient.removeTargets({
+      Rule: ruleName,
+      Ids: targetIds,
+    });
+  }
+
+  async removeTaskDefinition(params: { placeId: string }): Promise<void> {
+    let { placeId } = params;
+    this.logger.debug(`Remove task definition ${placeId}`);
+    const { taskDefinitionArns } = await this.ecsClient.listTaskDefinitions({
+      familyPrefix: this.getTaskDefinitionFamily({ placeId }),
+    });
+    for (let i = 0; i < taskDefinitionArns.length; i++) {
+      await this.ecsClient.deregisterTaskDefinition({
+        taskDefinition: taskDefinitionArns[i],
+      });
+    }
+  }
+
   async createTaskDefinition(params: {
     placeId: string;
     streamUrl: string;
+    duration: number;
   }): Promise<{ taskDefinitionArn: string }> {
-    let { placeId, streamUrl } = params;
+    let { placeId, streamUrl, duration } = params;
     this.logger.debug('Create task definition');
     const result = await this.ecsClient.registerTaskDefinition({
-      family: `${placeId}_sunset-recorder`,
+      family: this.getTaskDefinitionFamily({ placeId }),
       requiresCompatibilities: ['FARGATE'],
       networkMode: 'awsvpc',
       cpu: '256',
@@ -137,7 +195,7 @@ export class AWSService {
             },
           },
           environment: [
-            { name: 'DURATION', value: '20' },
+            { name: 'DURATION', value: `${duration}` },
             { name: 'TIMELAPSE_FACTOR', value: '0.016' },
             { name: 'PLACE_ID', value: placeId },
             { name: 'STREAM_URL', value: streamUrl },
@@ -171,7 +229,7 @@ export class AWSService {
           EcsParameters: {
             LaunchType: 'FARGATE',
             TaskDefinitionArn: taskDefinitionArn,
-            PlatformVersion: "1.4.0",
+            PlatformVersion: '1.4.0',
             NetworkConfiguration: {
               awsvpcConfiguration: {
                 AssignPublicIp: 'ENABLED',
@@ -183,5 +241,9 @@ export class AWSService {
         },
       ],
     });
+  }
+
+  private getTaskDefinitionFamily(params: { placeId: string }) {
+    return `${params.placeId}_sunset-recorder`;
   }
 }

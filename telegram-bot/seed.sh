@@ -4,6 +4,8 @@ aws lambda invoke --function-name $LAMBDA_NAME \
                "id": "hague-beach",
                "type": "add_place",
                "name": "Hague",
+               "start_offset": 13,
+               "duration":20,
                "lat": "52.117891",
                "lon": "4.279861",
                "stream_url": "https://59f185ece6219.streamlock.net/live/_definst_/sys2.stream/playlist.m3u8"
@@ -13,6 +15,8 @@ aws lambda invoke --function-name $LAMBDA_NAME \
   --payload '{
                "id": "hague-noordwijk",
                "type": "add_place",
+               "start_offset": 13,
+               "duration":20,
                "name": "Coast Surf Club Noordwijk",
                "lat": "52.235504",
                "lon": "4.420697",
@@ -23,6 +27,8 @@ aws lambda invoke --function-name $LAMBDA_NAME \
   --payload '{
                "id": "hague-zeilvereniging",
                "type": "add_place",
+               "start_offset": 13,
+               "duration":20,
                "name": "Zeilvereniging Noordwijk",
                "lat": "52.2438376",
                "lon": "4.4241582",
@@ -33,6 +39,8 @@ aws lambda invoke --function-name $LAMBDA_NAME \
   --payload '{
                "id": "harlem-bloemendaal",
                "type": "add_place",
+               "start_offset": 13,
+               "duration":20,
                "name": "Bloemendaal aan Zee",
                "lat": "52.3990412",
                "lon": "4.3863241",
@@ -44,6 +52,8 @@ aws lambda invoke --function-name $LAMBDA_NAME \
                "id": "ndl-paal-17",
                "type": "add_place",
                "name": "Paal 17",
+               "start_offset": 13,
+               "duration":20,
                "lat": "52.8437104",
                "lon": "4.795708",
                "stream_url": "https://565c3c746b763.streamlock.net/hls/paal17b.stream/chunklist_w1122015977_tkd293emF0b2tlbmVuZHRpbWU9MTY2MDI5OTA5NSZ3b3d6YXRva2VuaGFzaD1lUVVXc1lGYnhReWNzdmstaTVnVVFmdDlNV0E3LVhCTTJyS1VTdElEVFVrPSZ3b3d6YXRva2Vuc3RhcnR0aW1lPTE2NjAyOTcyMzU=.m3u8"

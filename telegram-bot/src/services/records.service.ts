@@ -16,16 +16,23 @@ export class RecordsService {
 
   async addNewRecord(params: {
     placeId: string;
+    lat: string;
+    lon: string;
     messageId: string;
-    file: string;
   }): Promise<{ recordId: string }> {
-    let { file, messageId, placeId } = params;
-    this.logger.debug(`Add record for place ${placeId} and with file ${file}`);
-    const recordId = placeId + file;
+    let { messageId, placeId, lat, lon } = params;
+    this.logger.debug(`Add record for place ${placeId}`);
+    const recordId = `${placeId}_${messageId}`;
+
+    const weather = await this.weatherService.getCurrentWeather({
+      lat,
+      lon,
+    });
+
     await this.awsService.putItemToRecordTable({
       recordId: recordId,
-      videoKey: file,
       messageId: messageId,
+      ...weather,
     });
     return { recordId };
   }
