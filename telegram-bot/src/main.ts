@@ -24,11 +24,3 @@ export const handler: Handler = async (
   const handler = await bootstrapServer();
   return handler.processEvent(event, context, callback);
 };
-
-handler(
-  {
-    type: 'regenerate_places',
-  },
-  null,
-  () => undefined,
-);

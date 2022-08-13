@@ -171,9 +171,10 @@ export class AWSService {
           EcsParameters: {
             LaunchType: 'FARGATE',
             TaskDefinitionArn: taskDefinitionArn,
+            PlatformVersion: "1.4.0",
             NetworkConfiguration: {
               awsvpcConfiguration: {
-                AssignPublicIp: 'DISABLED',
+                AssignPublicIp: 'ENABLED',
                 Subnets: [this.awsConfig.subnetArn],
                 SecurityGroups: [this.awsConfig.securityGroupArn],
               },

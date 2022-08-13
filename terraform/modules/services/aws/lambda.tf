@@ -28,8 +28,8 @@ resource "aws_lambda_function" "telegram_bot" {
       AWS_EVENT_EXECUTION_ROLE_ARN      = aws_iam_role.event_execution.arn
       AWS_ECS_EXECUTION_ROLE_ARN        = aws_iam_role.ecs_execution.arn
       AWS_ECS_TASK_ROLE_ARN             = aws_iam_role.ecs_task.arn
-      AWS_SECURITY_GROUP_ARN            = aws_security_group.ecs_sg.arn,
-      AWS_SUBNET_ARN                    = aws_subnet.pub_subnet.arn,
+      AWS_SECURITY_GROUP_ARN            = aws_security_group.ecs_sg.id,
+      AWS_SUBNET_ARN                    = aws_subnet.pub_subnet.id,
       OPEN_WEATHER_TOKEN                = var.open_weather_token
     }
   }

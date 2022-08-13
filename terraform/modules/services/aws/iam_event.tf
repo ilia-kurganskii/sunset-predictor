@@ -32,7 +32,11 @@ resource "aws_iam_policy" "event_execution" {
       },
       {
         "Effect" : "Allow",
-        "Action" : "iam:PassRole",
+        "Action" : [
+          "iam:PassRole",
+          "iam:ListInstanceProfiles",
+          "iam:ListRoles"
+        ],
         "Resource" : [
           "*"
         ]
