@@ -1,9 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Place } from '../models/place.model';
 import { AWSService } from './aws.service';
-import { getSunsetTime } from '../controllers/app.utils';
 import { WeatherService } from './weather.service';
-import { TelegramService } from './telegram.service';
+import { GeoService } from './geo.service';
 
 @Injectable()
 export class RecordsService {
@@ -12,6 +10,7 @@ export class RecordsService {
   constructor(
     private readonly awsService: AWSService,
     private readonly weatherService: WeatherService,
+    private readonly geoService: GeoService,
   ) {}
 
   async addNewRecord(params: {
@@ -24,15 +23,28 @@ export class RecordsService {
     this.logger.debug(`Add record for place ${placeId}`);
     const recordId = `${placeId}_${messageId}`;
 
-    const weather = await this.weatherService.getCurrentWeather({
+    const placeWeather = await this.weatherService.getCurrentWeather({
       lat,
       lon,
+    });
+
+    const sunsetCoordinates = this.geoService.getSunsetPosition({
+      distanceKm: 160,
+      lat: Number.parseFloat(lat),
+      lon: Number.parseFloat(lon),
+      sunset: placeWeather.sunset * 1000,
+    });
+
+    const sunsetWeather = await this.weatherService.getCurrentWeather({
+      lat: sunsetCoordinates.lat,
+      lon: sunsetCoordinates.lon,
     });
 
     await this.awsService.putItemToRecordTable({
       recordId: recordId,
       messageId: messageId,
-      ...weather,
+      placeWeather,
+      sunsetWeather,
     });
     return { recordId };
   }

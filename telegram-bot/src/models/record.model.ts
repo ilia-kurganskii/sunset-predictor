@@ -1,8 +1,4 @@
-export interface RecordItem {
-  recordId: string;
-  messageId: string;
-
-  // Weather
+export interface Weather {
   temp: number;
   pressure: number;
   humidity: number;
@@ -13,4 +9,13 @@ export interface RecordItem {
   wind_speed: number;
   wind_deg: number;
   wind_gust: number;
+}
+
+export interface RecordItem {
+  recordId: string;
+  messageId: string;
+
+  // Weather
+  placeWeather: Weather;
+  sunsetWeather: Weather;
 }

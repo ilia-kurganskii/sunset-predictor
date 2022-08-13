@@ -9,6 +9,7 @@ import { WeatherService } from './services/weather.service';
 import { NotificationService } from './services/notification.service';
 import { PlaceService } from './services/place.service';
 import { RecordsService } from './services/records.service';
+import { GeoService } from "./services/geo.service";
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { RecordsService } from './services/records.service';
     RecordsService,
     AWSService,
     WeatherService,
+    GeoService
   ],
 })
 export class AppModule {}

@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import {
   ConfigurationVariables,
   OpenWeatherConfig,
-  TelegramConfig,
 } from '../config/configuration.model';
 
 @Injectable()
@@ -19,8 +18,8 @@ export class WeatherService {
   }
 
   getCurrentWeather = async (params: {
-    lat: string;
-    lon: string;
+    lat: string | number;
+    lon: string | number;
   }): Promise<{
     sunrise: number;
     sunset: number;
@@ -47,11 +46,4 @@ export class WeatherService {
       })
       .then((response) => response.data.current);
   };
-}
-
-function extractErrorMessage(e: any) {
-  if (e.response?.data) {
-    return JSON.stringify(e.response.data);
-  }
-  return e.message;
 }

@@ -13,6 +13,7 @@ import {
 import { PlaceService } from '../services/place.service';
 import { NotificationService } from '../services/notification.service';
 import { RecordsService } from '../services/records.service';
+import { GeoService } from '../services/geo.service';
 
 @Controller()
 export class AppController {
@@ -20,6 +21,7 @@ export class AppController {
     public readonly notificationService: NotificationService,
     public readonly awsService: AWSService,
     public readonly recordsService: RecordsService,
+    public readonly geoService: GeoService,
     public readonly placeService: PlaceService,
   ) {}
 

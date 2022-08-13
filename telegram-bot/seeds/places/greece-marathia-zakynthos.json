@@ -1,0 +1,10 @@
+{
+  "id": "greece-marathia-zakynthos",
+  "type": "add_place",
+  "name": "Marathia-Zakynthos (Greece)",
+  "start_offset": 23,
+  "duration": 30,
+  "lat": "37.669888",
+  "lon": "20.851413",
+  "stream_url": "https://cdn-005.whatsupcams.com/hls/gr_zakynthos01.m3u8"
+}
