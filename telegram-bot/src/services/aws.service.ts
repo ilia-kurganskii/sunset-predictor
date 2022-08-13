@@ -138,7 +138,7 @@ export class AWSService {
           },
           environment: [
             { name: 'DURATION', value: '20' },
-            { name: 'TIMELAPSE_FACTOR', value: '1' },
+            { name: 'TIMELAPSE_FACTOR', value: '0.016' },
             { name: 'PLACE_ID', value: placeId },
             { name: 'STREAM_URL', value: streamUrl },
             { name: 'AWS_BUCKET', value: this.awsConfig.bucketRecordsName },
