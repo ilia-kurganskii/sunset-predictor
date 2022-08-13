@@ -28,7 +28,19 @@ export class NotificationService {
     });
     const { messageId } = await this.telegramService.sendPoll({
       question: `Rate the sunset in ${placeName}^`,
-      options: ['5', '4', '3', '2', '1', 'Colored clouds', 'Clean horizons'],
+      options: [
+        'rate5: 5',
+        'rate4: 5',
+        'rate3: 3',
+        'rate2: 2',
+        'rate1: 1',
+        'factor1: Colored clouds',
+        'factor2: Clean horizons',
+        'factor3: TBD',
+        'factor4: TBD',
+        'factor5: TBD',
+        'factor6: TBD',
+      ],
       allows_multiple_answers: true,
     });
 

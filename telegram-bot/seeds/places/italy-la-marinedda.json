@@ -1,0 +1,10 @@
+{
+  "id": "italy-la-marinedda",
+  "type": "add_place",
+  "name": "La Marinedda (Italy)",
+  "start_offset": 23,
+  "duration": 30,
+  "lat": "41.0132449",
+  "lon": "8.8913035",
+  "stream_url": "https://cdn-005.whatsupcams.com/hls/it_agultu01.m3u8"
+}
