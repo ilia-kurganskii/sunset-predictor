@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { Callback, Context } from 'aws-lambda';
 import { AWSService } from '../services/aws.service';
 import {
@@ -13,15 +13,15 @@ import {
 import { PlaceService } from '../services/place.service';
 import { NotificationService } from '../services/notification.service';
 import { RecordsService } from '../services/records.service';
-import { GeoService } from '../services/geo.service';
 
 @Controller()
 export class AppController {
+  private logger = new Logger(AppController.name, { timestamp: false });
+
   constructor(
     public readonly notificationService: NotificationService,
     public readonly awsService: AWSService,
     public readonly recordsService: RecordsService,
-    public readonly geoService: GeoService,
     public readonly placeService: PlaceService,
   ) {}
 
@@ -30,6 +30,7 @@ export class AppController {
     context: Context,
     callback: Callback,
   ) => {
+    this.logger.log(`Process event ${JSON.stringify(event)}`);
     try {
       switch (event.type) {
         case EventType.VIDEO_RECORDED:
@@ -51,16 +52,26 @@ export class AppController {
         case EventType.DELETE_PLACE:
           await this.onDeletePlace(event);
           break;
+        default:
+          callback(
+            `Event handler not found for for ${JSON.stringify(event)}`,
+            null,
+          );
+          return;
       }
       callback(null, 'success');
-    } catch (e) {
-      console.error(e);
-      callback(e, null);
+    } catch (e: unknown) {
+      this.logger.error('Something went wrong', e);
+      if (e instanceof Error) {
+        callback(e, null);
+      } else {
+        callback('Something went wrong ' + e, null);
+      }
     }
   };
 
   private onVideoRecoded = async (event: VideoRecordedEvent): Promise<void> => {
-    let { file, place_id } = event;
+    const { file, place_id } = event;
     const place = await this.placeService.getPlaceById(place_id);
     const { messageId } = await this.notificationService.notifyAboutNewVideo({
       placeName: place.name,
@@ -78,7 +89,7 @@ export class AppController {
   };
 
   private onAddPlace = async (event: AddPlaceEvent): Promise<void> => {
-    let { name, id, lat, lon, start_offset, duration, stream_url } = event;
+    const { name, id, lat, lon, start_offset, duration, stream_url } = event;
 
     await this.placeService.createPlace({
       id,
@@ -92,7 +103,7 @@ export class AppController {
   };
 
   private onRefreshAllSchedule = async (
-    event: UpdateAllSchedule,
+    _: UpdateAllSchedule,
   ): Promise<void> => {
     const places = await this.placeService.getAllPlaces();
     await Promise.all(
@@ -102,9 +113,7 @@ export class AppController {
     );
   };
 
-  private onRegeneratePlaces = async (
-    event: RegeneratePlaces,
-  ): Promise<void> => {
+  private onRegeneratePlaces = async (_: RegeneratePlaces): Promise<void> => {
     const places = await this.placeService.getAllPlaces();
     await Promise.all(
       places.map((place) => {

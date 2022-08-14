@@ -108,10 +108,11 @@ export class AWSService {
     minUtc: number;
     hourUtc: number;
   }): Promise<{ ruleName: string }> {
-    let { hourUtc, minUtc, placeId } = params;
+    const { hourUtc, minUtc, placeId } = params;
     const ruleName = placeId;
     const cronTime = `cron(${minUtc} ${hourUtc} * * ? *)`;
     this.logger.debug(`Set recorder rule (${cronTime}) with name ${ruleName}`);
+
     await this.eventBridgeClient.putRule({
       Name: placeId,
       Description: `Rule to record sunset for placeId: ${placeId}`,
@@ -128,6 +129,7 @@ export class AWSService {
   async removeScheduleRule(params: { placeId: string }): Promise<void> {
     const ruleName = params.placeId;
     this.logger.debug(`Remove rule with name ${ruleName}`);
+
     await this.removeTargetsForRule({ ruleName });
     await this.eventBridgeClient.deleteRule({
       Name: ruleName,
@@ -152,14 +154,15 @@ export class AWSService {
   }
 
   async removeTaskDefinition(params: { placeId: string }): Promise<void> {
-    let { placeId } = params;
+    const { placeId } = params;
     this.logger.debug(`Remove task definition ${placeId}`);
+
     const { taskDefinitionArns } = await this.ecsClient.listTaskDefinitions({
-      familyPrefix: this.getTaskDefinitionFamily({ placeId }),
+      familyPrefix: getTaskDefinitionFamily({ placeId }),
     });
-    for (let i = 0; i < taskDefinitionArns.length; i++) {
+    for (const taskDefinition of taskDefinitionArns) {
       await this.ecsClient.deregisterTaskDefinition({
-        taskDefinition: taskDefinitionArns[i],
+        taskDefinition: taskDefinition,
       });
     }
   }
@@ -169,10 +172,11 @@ export class AWSService {
     streamUrl: string;
     duration: number;
   }): Promise<{ taskDefinitionArn: string }> {
-    let { placeId, streamUrl, duration } = params;
-    this.logger.debug('Create task definition');
+    const { placeId, streamUrl, duration } = params;
+    this.logger.debug(`Create task definition for place ${placeId}`);
+
     const result = await this.ecsClient.registerTaskDefinition({
-      family: this.getTaskDefinitionFamily({ placeId }),
+      family: getTaskDefinitionFamily({ placeId }),
       requiresCompatibilities: ['FARGATE'],
       networkMode: 'awsvpc',
       cpu: '256',
@@ -217,7 +221,7 @@ export class AWSService {
     taskDefinitionArn: string;
     ruleName: string;
   }) {
-    let { placeId, taskDefinitionArn, ruleName } = params;
+    const { placeId, taskDefinitionArn, ruleName } = params;
     this.logger.debug(`Set rule(${ruleName}) targets: ${taskDefinitionArn} `);
     await this.eventBridgeClient.putTargets({
       Rule: ruleName,
@@ -242,8 +246,8 @@ export class AWSService {
       ],
     });
   }
+}
 
-  private getTaskDefinitionFamily(params: { placeId: string }) {
-    return `${params.placeId}_sunset-recorder`;
-  }
+function getTaskDefinitionFamily(params: { placeId: string }) {
+  return `${params.placeId}_sunset-recorder`;
 }

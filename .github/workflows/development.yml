@@ -94,13 +94,17 @@ jobs:
         with:
           node-version: 16
 
+      - name: Terraform init
+        working-directory: terraform/environments/dev
+        run: terraform init
+
       - name: Install dependencies
         working-directory: telegram-bot
         run: yarn install --frozen-lockfile
 
-      - name: Terraform init
-        working-directory: terraform/environments/dev
-        run: terraform init
+      - name: Linter
+        working-directory: telegram-bot
+        run: yarn lint
 
       - name: Build
         working-directory: telegram-bot
@@ -172,7 +176,8 @@ jobs:
       - name: Build docker
         run: |
           ECR_URL=$(terraform -chdir=terraform/environments/dev output -raw  ecr_repository_url)
-          docker build -t $ECR_URL:$GITHUB_RUN_ID -t $ECR_URL:latest ./sunset-recorder
+          docker pull $ECR_URL:latest || true
+          docker build --cache-from:$ECR_URL:latest -t $ECR_URL:latest ./sunset-recorder
 
       - name: Push image to Amazon ECR
         if: github.ref == 'refs/heads/develop' && github.event_name == 'push'

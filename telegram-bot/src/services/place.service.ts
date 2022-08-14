@@ -20,7 +20,7 @@ export class PlaceService {
     const { taskDefinitionArn } = await this.awsService.createTaskDefinition({
       placeId: item.id,
       streamUrl: item.streamUrl,
-      duration: item.duration
+      duration: item.duration,
     });
 
     const weather = await this.weatherService.getCurrentWeather({
@@ -85,7 +85,7 @@ export class PlaceService {
     startOffset: number;
     sunsetTimestamp: number;
   }) {
-    let { placeId, sunsetTimestamp, startOffset = 0 } = params;
+    const { placeId, sunsetTimestamp, startOffset = 0 } = params;
     const sunsetUtcDate = getSunsetTime(sunsetTimestamp - startOffset * 60);
 
     const { ruleName } = await this.awsService.setRecorderRule({

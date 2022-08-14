@@ -17,8 +17,8 @@ export class NotificationService {
     file: string;
     placeName: string;
   }): Promise<{ messageId: string }> {
-    let { file, placeName } = params;
-    this.logger.debug(`Notify about new video for place ${placeName}`)
+    const { file, placeName } = params;
+    this.logger.debug(`Notify about new video for place ${placeName}`);
     const url = await this.awsService.getSignedUrlForFile(file);
 
     await this.telegramService.sendVideo({

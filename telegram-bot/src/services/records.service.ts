@@ -19,7 +19,7 @@ export class RecordsService {
     lon: string;
     messageId: string;
   }): Promise<{ recordId: string }> {
-    let { messageId, placeId, lat, lon } = params;
+    const { messageId, placeId, lat, lon } = params;
     this.logger.debug(`Add record for place ${placeId}`);
     const recordId = `${placeId}_${messageId}`;
 

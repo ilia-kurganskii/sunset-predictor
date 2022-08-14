@@ -11,7 +11,7 @@ export class GeoService {
     lon: number;
     distanceKm: number;
   }) {
-    let { distanceKm, lat, lon, sunset } = params;
+    const { distanceKm, lat, lon, sunset } = params;
     const sunPosition = SunCalc.getPosition(sunset, lat, lon);
     const sunriseAzimuth = sunPosition.azimuth - Math.PI;
 

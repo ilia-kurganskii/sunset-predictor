@@ -34,7 +34,7 @@ export class WeatherService {
     wind_deg: number;
     wind_gust: number;
   }> => {
-    let { lat, lon } = params;
+    const { lat, lon } = params;
     return await this.httpService.axiosRef
       .get(`https://api.openweathermap.org/data/3.0/onecall`, {
         params: {
