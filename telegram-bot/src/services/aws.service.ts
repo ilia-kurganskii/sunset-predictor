@@ -57,7 +57,7 @@ export class AWSService {
   }
 
   async putItemToRecordTable(item: RecordItem) {
-    this.logger.debug(`Put item to record table recordId: ${item.recordId}`);
+    this.logger.debug(`Put item to record table pollId: ${item.pollId}`);
 
     return this.dynamoDbClient.put({
       TableName: this.awsConfig.dynamoDbRecordsName,
