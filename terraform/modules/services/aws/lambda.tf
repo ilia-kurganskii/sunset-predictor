@@ -17,8 +17,10 @@ resource "aws_lambda_function" "telegram_bot" {
 
   environment {
     variables = {
+      APP_TIMELAPSE_FACTOR              = var.app_timelapse_factor
       TELEGRAM_TOKEN                    = var.telegram_token
       TELEGRAM_CHAT_ID                  = var.telegram_chat_id
+      OPEN_WEATHER_TOKEN                = var.open_weather_token
       AWS_BUCKET_RECORDS                = aws_s3_bucket.records.bucket
       AWS_CLUSTER_ARN                   = aws_ecs_cluster.ecs_cluster.arn
       AWS_DYNAMO_DB_PLACE_TABLE_NAME    = aws_dynamodb_table.places.name
@@ -30,7 +32,6 @@ resource "aws_lambda_function" "telegram_bot" {
       AWS_ECS_TASK_ROLE_ARN             = aws_iam_role.ecs_task.arn
       AWS_SECURITY_GROUP_ARN            = aws_security_group.ecs_sg.id,
       AWS_SUBNET_ARN                    = aws_subnet.pub_subnet.id,
-      OPEN_WEATHER_TOKEN                = var.open_weather_token
       NO_COLOR                          = true
     }
   }

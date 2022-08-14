@@ -11,8 +11,10 @@ module "aws_infra" {
   asg_max_size        = 2
   force_destroy       = true
   aws_region          = local.aws_region
-  env                 = local.env
-  open_weather_token  = var.open_weather_token
-  telegram_chat_id    = var.telegram_chat_id
-  telegram_token      = var.telegram_token
+
+  env                  = local.env
+  open_weather_token   = var.open_weather_token
+  telegram_chat_id     = var.telegram_chat_id
+  telegram_token       = var.telegram_token
+  app_timelapse_factor = "1"
 }

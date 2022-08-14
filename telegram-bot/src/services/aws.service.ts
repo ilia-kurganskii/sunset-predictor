@@ -171,8 +171,9 @@ export class AWSService {
     placeId: string;
     streamUrl: string;
     duration: number;
+    timelapseFactor: string;
   }): Promise<{ taskDefinitionArn: string }> {
-    const { placeId, streamUrl, duration } = params;
+    const { placeId, streamUrl, duration, timelapseFactor } = params;
     this.logger.debug(`Create task definition for place ${placeId}`);
 
     const result = await this.ecsClient.registerTaskDefinition({
@@ -200,7 +201,7 @@ export class AWSService {
           },
           environment: [
             { name: 'DURATION', value: `${duration}` },
-            { name: 'TIMELAPSE_FACTOR', value: '0.016' },
+            { name: 'TIMELAPSE_FACTOR', value: `${timelapseFactor}` },
             { name: 'PLACE_ID', value: placeId },
             { name: 'STREAM_URL', value: streamUrl },
             { name: 'AWS_BUCKET', value: this.awsConfig.bucketRecordsName },

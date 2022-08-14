@@ -3,15 +3,23 @@ import { Place } from '../models/place.model';
 import { AWSService } from './aws.service';
 import { getSunsetTime } from '../controllers/app.utils';
 import { WeatherService } from './weather.service';
+import {
+  AppConfig,
+  ConfigurationVariables,
+} from '../config/configuration.model';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PlaceService {
   private readonly logger = new Logger(PlaceService.name);
-
+  private readonly appConfig: AppConfig;
   constructor(
     private readonly awsService: AWSService,
     private readonly weatherService: WeatherService,
-  ) {}
+    private readonly configService: ConfigService<ConfigurationVariables>,
+  ) {
+    this.appConfig = configService.get<AppConfig>('app');
+  }
 
   async createPlace(place: Place) {
     this.logger.debug(`Create place ${JSON.stringify(place)}`);
@@ -21,6 +29,7 @@ export class PlaceService {
       placeId: item.id,
       streamUrl: item.streamUrl,
       duration: item.duration,
+      timelapseFactor: this.appConfig.timelapseFactor,
     });
 
     const weather = await this.weatherService.getCurrentWeather({
