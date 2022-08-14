@@ -12,7 +12,6 @@ export interface Weather {
 }
 
 export interface RecordItem {
-  recordId: string;
   pollId: string;
 
   // Weather

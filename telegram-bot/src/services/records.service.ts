@@ -19,10 +19,9 @@ export class RecordsService {
     lat: string;
     lon: string;
     pollId: string;
-  }): Promise<{ recordId: string }> {
+  }): Promise<{ pollId: string }> {
     const { pollId, placeId, lat, lon } = params;
-    this.logger.debug(`Add record for place ${placeId}`);
-    const recordId = `${placeId}_${pollId}`;
+    this.logger.debug(`Add record for place ${placeId} with pollId ${pollId}`);
 
     const placeWeather = await this.weatherService.getCurrentWeather({
       lat,
@@ -42,12 +41,11 @@ export class RecordsService {
     });
 
     await this.awsService.putItemToRecordTable({
-      recordId: recordId,
       pollId,
       placeWeather,
       sunsetWeather,
     });
-    return { recordId };
+    return { pollId };
   }
 
   processPoll = async (poll: Poll) => {
