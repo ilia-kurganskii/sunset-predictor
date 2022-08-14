@@ -1,9 +1,13 @@
+import { Poll } from './poll';
+
 export enum EventType {
   VIDEO_RECORDED = 'video_recorded',
   ADD_PLACE = 'add_place',
   UPDATE_ALL_SCHEDULE = 'update_all_schedule',
   REGENERATE_PLACES = 'regenerate_places',
   DELETE_PLACE = 'delete_place',
+  PROCESS_POLL = 'process_poll',
+  INIT = 'init',
 }
 
 export interface VideoRecordedEvent {
@@ -23,22 +27,33 @@ export interface AddPlaceEvent {
   stream_url: string;
 }
 
-export interface UpdateAllSchedule {
+export interface UpdateAllScheduleEvent {
   type: EventType.UPDATE_ALL_SCHEDULE;
 }
 
-export interface RegeneratePlaces {
+export interface ProcessPollEvent {
+  type: EventType.PROCESS_POLL;
+  poll: Poll;
+}
+
+export interface RegeneratePlacesEvent {
   type: EventType.REGENERATE_PLACES;
 }
 
-export interface DeletePlace {
+export interface DeletePlaceEvent {
   type: EventType.DELETE_PLACE;
   place_id: string;
+}
+
+export interface InitEvent {
+  type: EventType.INIT;
 }
 
 export type AppEvent =
   | VideoRecordedEvent
   | AddPlaceEvent
-  | UpdateAllSchedule
-  | DeletePlace
-  | RegeneratePlaces;
+  | UpdateAllScheduleEvent
+  | DeletePlaceEvent
+  | RegeneratePlacesEvent
+  | ProcessPollEvent
+  | InitEvent;

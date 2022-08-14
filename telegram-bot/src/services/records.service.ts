@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AWSService } from './aws.service';
 import { WeatherService } from './weather.service';
 import { GeoService } from './geo.service';
+import { Poll } from '../models/poll';
 
 @Injectable()
 export class RecordsService {
@@ -17,11 +18,11 @@ export class RecordsService {
     placeId: string;
     lat: string;
     lon: string;
-    messageId: string;
+    pollId: string;
   }): Promise<{ recordId: string }> {
-    const { messageId, placeId, lat, lon } = params;
+    const { pollId, placeId, lat, lon } = params;
     this.logger.debug(`Add record for place ${placeId}`);
-    const recordId = `${placeId}_${messageId}`;
+    const recordId = `${placeId}_${pollId}`;
 
     const placeWeather = await this.weatherService.getCurrentWeather({
       lat,
@@ -42,10 +43,25 @@ export class RecordsService {
 
     await this.awsService.putItemToRecordTable({
       recordId: recordId,
-      messageId: messageId,
+      pollId,
       placeWeather,
       sunsetWeather,
     });
     return { recordId };
   }
+
+  processPoll = async (poll: Poll) => {
+    const recordItem = await this.awsService.getRecordByMessageId(poll.id);
+    if (recordItem) {
+      await this.awsService.putItemToRecordTable({
+        ...recordItem,
+        poll: poll.options.map((item) => ({
+          text: item.text,
+          voterCount: item.voter_count,
+        })),
+      });
+    } else {
+      this.logger.warn(`Record item for pollId ${poll.id} not found`);
+    }
+  };
 }

@@ -13,9 +13,13 @@ export interface Weather {
 
 export interface RecordItem {
   recordId: string;
-  messageId: string;
+  pollId: string;
 
   // Weather
   placeWeather: Weather;
   sunsetWeather: Weather;
+  poll?: {
+    text: string;
+    voterCount: number;
+  }[];
 }

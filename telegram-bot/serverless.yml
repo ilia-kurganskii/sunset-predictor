@@ -12,6 +12,6 @@ functions:
   main:
     handler: dist/main.handler
     events:
-      - eventBridge:
+      - http:
           method: ANY
           path: /

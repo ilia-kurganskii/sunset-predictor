@@ -1,18 +1,20 @@
 import { Controller, Logger } from '@nestjs/common';
-import { Callback, Context } from 'aws-lambda';
 import { AWSService } from '../services/aws.service';
 import {
   AddPlaceEvent,
   AppEvent,
-  DeletePlace,
+  DeletePlaceEvent,
   EventType,
-  RegeneratePlaces,
-  UpdateAllSchedule,
+  InitEvent,
+  ProcessPollEvent,
+  RegeneratePlacesEvent,
+  UpdateAllScheduleEvent,
   VideoRecordedEvent,
 } from '../models/event.model';
 import { PlaceService } from '../services/place.service';
 import { NotificationService } from '../services/notification.service';
 import { RecordsService } from '../services/records.service';
+import { TelegramService } from '../services/telegram.service';
 
 @Controller()
 export class AppController {
@@ -23,63 +25,57 @@ export class AppController {
     public readonly awsService: AWSService,
     public readonly recordsService: RecordsService,
     public readonly placeService: PlaceService,
+    public readonly telegramService: TelegramService,
   ) {}
 
-  processEvent = async (
-    event: AppEvent,
-    context: Context,
-    callback: Callback,
-  ) => {
+  processEvent = async (event: AppEvent) => {
     this.logger.log(`Process event ${JSON.stringify(event)}`);
-    try {
-      switch (event.type) {
-        case EventType.VIDEO_RECORDED:
-          await this.onVideoRecoded(event);
-          break;
+    switch (event.type) {
+      case EventType.VIDEO_RECORDED:
+        await this.onVideoRecoded(event);
+        break;
 
-        case EventType.ADD_PLACE:
-          await this.onAddPlace(event);
-          break;
+      case EventType.ADD_PLACE:
+        await this.onAddPlace(event);
+        break;
 
-        case EventType.UPDATE_ALL_SCHEDULE:
-          await this.onRefreshAllSchedule(event);
-          break;
+      case EventType.UPDATE_ALL_SCHEDULE:
+        await this.onRefreshAllSchedule(event);
+        break;
 
-        case EventType.REGENERATE_PLACES:
-          await this.onRegeneratePlaces(event);
-          break;
+      case EventType.REGENERATE_PLACES:
+        await this.onRegeneratePlaces(event);
+        break;
 
-        case EventType.DELETE_PLACE:
-          await this.onDeletePlace(event);
-          break;
-        default:
-          callback(
-            `Event handler not found for for ${JSON.stringify(event)}`,
-            null,
-          );
-          return;
-      }
-      callback(null, 'success');
-    } catch (e: unknown) {
-      this.logger.error('Something went wrong', e);
-      if (e instanceof Error) {
-        callback(e, null);
-      } else {
-        callback('Something went wrong ' + e, null);
-      }
+      case EventType.DELETE_PLACE:
+        await this.onDeletePlace(event);
+        break;
+
+      case EventType.PROCESS_POLL:
+        await this.onProcessPoll(event);
+        break;
+
+      case EventType.INIT:
+        await this.onInit(event);
+        break;
+
+      default:
+        throw new Error(
+          `Event handler not found for for ${JSON.stringify(event)}`,
+        );
     }
   };
 
   private onVideoRecoded = async (event: VideoRecordedEvent): Promise<void> => {
     const { file, place_id } = event;
     const place = await this.placeService.getPlaceById(place_id);
-    const { messageId } = await this.notificationService.notifyAboutNewVideo({
+    const { pollId } = await this.notificationService.notifyAboutNewVideo({
       placeName: place.name,
       file: file,
     });
     await this.recordsService.addNewRecord({
       placeId: place_id,
-      messageId: messageId,
+      pollId,
       lat: place.lat,
       lon: place.lon,
     });
@@ -103,7 +99,7 @@ export class AppController {
   };
 
   private onRefreshAllSchedule = async (
-    _: UpdateAllSchedule,
+    _: UpdateAllScheduleEvent,
   ): Promise<void> => {
     const places = await this.placeService.getAllPlaces();
     await Promise.all(
@@ -113,7 +109,9 @@ export class AppController {
     );
   };
 
-  private onRegeneratePlaces = async (_: RegeneratePlaces): Promise<void> => {
+  private onRegeneratePlaces = async (
+    _: RegeneratePlacesEvent,
+  ): Promise<void> => {
     const places = await this.placeService.getAllPlaces();
     await Promise.all(
       places.map((place) => {
@@ -122,7 +120,15 @@ export class AppController {
     );
   };
 
-  private onDeletePlace = async (event: DeletePlace) => {
+  private onProcessPoll = async (event: ProcessPollEvent): Promise<void> => {
+    await this.recordsService.processPoll(event.poll);
+  };
+
+  private onInit = async (_: InitEvent): Promise<void> => {
+    await this.telegramService.registerWebhook();
+  };
+
+  private onDeletePlace = async (event: DeletePlaceEvent) => {
     await this.placeService.deletePlace(event.place_id);
   };
 }

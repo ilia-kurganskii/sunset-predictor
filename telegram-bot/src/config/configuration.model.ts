@@ -27,6 +27,7 @@ export interface AWSConfig {
 export interface TelegramConfig {
   chatId: string;
   token: string;
+  webhookUrl: string;
 }
 
 export interface OpenWeatherConfig {

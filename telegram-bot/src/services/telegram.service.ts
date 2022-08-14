@@ -37,10 +37,10 @@ export class TelegramService {
     options: string[];
     protect_content?: string;
     allows_multiple_answers?: boolean;
-  }): Promise<{ messageId: string }> => {
+  }): Promise<{ pollId: string }> => {
     this.logger.debug('Send poll to chat');
 
-    const data = await this.sendRequest<{ result: { message_id } }>(
+    const data = await this.sendRequest<{ result: { poll: { id } } }>(
       'sendPoll',
       {
         ...params,
@@ -49,11 +49,19 @@ export class TelegramService {
       },
     );
     return {
-      messageId: data.result.message_id,
+      pollId: data.result.poll.id,
     };
   };
 
-  sendRequest = async <T>(
+  registerWebhook = async () => {
+    this.logger.log(`Register webhook url: ${this.telegramConfig.webhookUrl}`);
+    await this.sendRequest('setWebhook', {
+      url: this.telegramConfig.webhookUrl,
+      allowed_updates: ['poll'],
+    });
+  };
+
+  private sendRequest = async <T>(
     methodName: string,
     params: Record<string, any>,
   ): Promise<T> => {
@@ -61,10 +69,7 @@ export class TelegramService {
       return await this.httpService.axiosRef
         .post<T>(
           `https://api.telegram.org/bot${this.telegramConfig.token}/${methodName}`,
-          {},
-          {
-            params,
-          },
+          params,
         )
         .then((response) => response.data);
     } catch (e) {

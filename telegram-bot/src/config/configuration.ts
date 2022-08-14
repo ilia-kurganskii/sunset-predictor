@@ -25,6 +25,7 @@ const configuration: ConfigurationVariables = {
   telegram: {
     token: process.env.TELEGRAM_TOKEN,
     chatId: process.env.TELEGRAM_CHAT_ID,
+    webhookUrl: process.env.TELEGRAM_WEBHOOK_URL,
   },
   openWeather: {
     token: process.env.OPEN_WEATHER_TOKEN,

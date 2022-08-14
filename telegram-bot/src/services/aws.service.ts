@@ -95,6 +95,17 @@ export class AWSService {
     return result.Item as Place;
   }
 
+  async getRecordByMessageId(pollId: string): Promise<RecordItem | undefined> {
+    this.logger.debug(`Get record by pollId "${pollId}"`);
+    const result = await this.dynamoDbClient.get({
+      TableName: this.awsConfig.dynamoDbRecordsName,
+      Key: {
+        pollId,
+      },
+    });
+    return result?.Item as RecordItem;
+  }
+
   async getAllPlaces(): Promise<Place[]> {
     this.logger.debug(`Get all places"`);
     const result = await this.dynamoDbClient.scan({

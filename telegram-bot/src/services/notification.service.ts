@@ -16,7 +16,7 @@ export class NotificationService {
   async notifyAboutNewVideo(params: {
     file: string;
     placeName: string;
-  }): Promise<{ messageId: string }> {
+  }): Promise<{ pollId: string }> {
     const { file, placeName } = params;
     this.logger.debug(`Notify about new video for place ${placeName}`);
     const url = await this.awsService.getSignedUrlForFile(file);
@@ -25,7 +25,7 @@ export class NotificationService {
       caption: `Sunset in ${placeName}`,
       videoUrl: url,
     });
-    const { messageId } = await this.telegramService.sendPoll({
+    const { pollId } = await this.telegramService.sendPoll({
       question: `Rate the sunset in ${placeName}^`,
       options: [
         'factor1: Colored clouds',
@@ -36,6 +36,6 @@ export class NotificationService {
       allows_multiple_answers: true,
     });
 
-    return { messageId };
+    return { pollId };
   }
 }
