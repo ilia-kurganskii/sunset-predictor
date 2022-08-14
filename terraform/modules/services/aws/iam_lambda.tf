@@ -25,6 +25,7 @@ resource "aws_iam_role_policy" "lambda_access_resources_policy" {
       {
         Action = [
           "s3:GetObject",
+          "s3:DeleteObject",
         ]
         Effect   = "Allow"
         Resource = ["${aws_s3_bucket.records.arn}/*"]
