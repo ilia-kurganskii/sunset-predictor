@@ -18,3 +18,7 @@ output "s3_lambda_bucket_key" {
 output "lambda_function_name" {
   value = aws_lambda_function.telegram_bot.function_name
 }
+
+output "lambda_function_url" {
+  value = aws_lambda_function_url.lambda_url.function_url
+}

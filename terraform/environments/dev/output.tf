@@ -13,3 +13,7 @@ output "s3_lambda_bucket_key" {
 output "lambda_name" {
   value = module.aws_infra.lambda_function_name
 }
+
+output "lambda_function_url" {
+  value = module.aws_infra.lambda_function_url
+}

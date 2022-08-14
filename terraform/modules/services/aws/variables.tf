@@ -48,6 +48,7 @@ variable "app_timelapse_factor" {
   type = string
 }
 
+
 variable "force_destroy" {
   type    = bool
   default = null

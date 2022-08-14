@@ -53,10 +53,11 @@ export class TelegramService {
     };
   };
 
-  registerWebhook = async () => {
-    this.logger.log(`Register webhook url: ${this.telegramConfig.webhookUrl}`);
+  registerWebhook = async (params: { url: string }) => {
+    const { url } = params;
+    this.logger.log(`Register webhook url: ${url}`);
     await this.sendRequest('setWebhook', {
-      url: this.telegramConfig.webhookUrl,
+      url,
       allowed_updates: ['poll'],
     });
   };

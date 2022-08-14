@@ -49,5 +49,5 @@ function extractEventFromInput(input: any): AppEvent {
     return input;
   }
 
-  throw new Error(`Input is not supported ${input}`);
+  throw new Error(`Input is not supported ${JSON.stringify(input)}`);
 }

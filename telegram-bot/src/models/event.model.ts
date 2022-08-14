@@ -47,6 +47,7 @@ export interface DeletePlaceEvent {
 
 export interface InitEvent {
   type: EventType.INIT;
+  webhook_url: string;
 }
 
 export type AppEvent =

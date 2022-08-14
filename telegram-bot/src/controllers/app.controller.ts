@@ -124,8 +124,10 @@ export class AppController {
     await this.recordsService.processPoll(event.poll);
   };
 
-  private onInit = async (_: InitEvent): Promise<void> => {
-    await this.telegramService.registerWebhook();
+  private onInit = async (event: InitEvent): Promise<void> => {
+    await this.telegramService.registerWebhook({
+      url: event.webhook_url,
+    });
   };
 
   private onDeletePlace = async (event: DeletePlaceEvent) => {

@@ -204,6 +204,7 @@ jobs:
       - name: Add places
         run: |
           NAME=$(terraform -chdir=terraform/environments/dev output -raw  lambda_name)
-          sh ./telegram-bot/seeds/seed.sh $NAME
+          FUNCTION_URL=$(terraform -chdir=terraform/environments/dev output -raw  lambda_function_url)
+          sh ./telegram-bot/seeds/seed.sh $NAME $FUNCTION_URL
 
 

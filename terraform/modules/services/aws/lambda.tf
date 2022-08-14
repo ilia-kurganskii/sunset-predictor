@@ -21,7 +21,6 @@ resource "aws_lambda_function" "telegram_bot" {
       TELEGRAM_TOKEN                    = var.telegram_token
       TELEGRAM_CHAT_ID                  = var.telegram_chat_id
       OPEN_WEATHER_TOKEN                = var.open_weather_token
-      TELEGRAM_WEBHOOK_URL              = aws_lambda_function_url.lambda_url
       AWS_BUCKET_RECORDS                = aws_s3_bucket.records.bucket
       AWS_CLUSTER_ARN                   = aws_ecs_cluster.ecs_cluster.arn
       AWS_DYNAMO_DB_PLACE_TABLE_NAME    = aws_dynamodb_table.places.name
