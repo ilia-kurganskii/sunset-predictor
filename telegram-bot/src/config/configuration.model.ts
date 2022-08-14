@@ -1,7 +1,12 @@
 export interface ConfigurationVariables {
   aws: AWSConfig;
+  app: AppConfig;
   telegram: TelegramConfig;
   openWeather: OpenWeatherConfig;
+}
+
+export interface AppConfig {
+  timelapseFactor: string;
 }
 
 export interface AWSConfig {

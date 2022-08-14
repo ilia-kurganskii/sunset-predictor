@@ -5,8 +5,8 @@ on:
 
 jobs:
   terraform:
-    environment: production
     name: "Terraform"
+    environment: production
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,22 +33,7 @@ jobs:
         id: validate
         run: terraform validate -no-color
 
-      - name: Terraform Plan
-        working-directory: terraform/environments/prod
-        id: plan
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          OPEN_WEATHER_TOKEN: ${{ secrets.OPEN_WEATHER_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        if: github.event_name == 'pull_request'
-        run: terraform plan -no-color \
-          -var="telegram_token=$TELEGRAM_BOT_TOKEN" \
-          -var="telegram_chat_id=$TELEGRAM_CHAT_ID" \
-          -var="open_weather_token=$OPEN_WEATHER_TOKEN"
-
-      - name: Terraform Apply (Prod)
+      - name: Terraform Apply
         working-directory: terraform/environments/prod
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -63,8 +48,8 @@ jobs:
             -var="open_weather_token=$OPEN_WEATHER_TOKEN"
 
   telegram-bot:
-    environment: production
     name: "Telegram bot"
+    environment: production
     runs-on: ubuntu-latest
     needs:
       - terraform
@@ -90,13 +75,17 @@ jobs:
         with:
           node-version: 16
 
+      - name: Terraform init
+        working-directory: terraform/environments/prod
+        run: terraform init
+
       - name: Install dependencies
         working-directory: telegram-bot
         run: yarn install --frozen-lockfile
 
-      - name: Terraform init
-        working-directory: terraform/environments/prod
-        run: terraform init
+      - name: Linter
+        working-directory: telegram-bot
+        run: yarn lint
 
       - name: Build
         working-directory: telegram-bot
@@ -120,12 +109,12 @@ jobs:
           BUCKET=$(terraform -chdir=terraform/environments/prod output -raw  s3_lambda_bucket)
           BUCKET_KEY=$(terraform -chdir=terraform/environments/prod output -raw  s3_lambda_bucket_key)
           NAME=$(terraform -chdir=terraform/environments/prod output -raw  lambda_name)
-          aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $BUCKET_KEY --publish > /dev/null  
+          aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $BUCKET_KEY --publish > /dev/null
   
 
   recorder-service:
-    environment: production
     name: "Recorder service"
+    environment: production
     runs-on: ubuntu-latest
     needs:
       - terraform
@@ -144,6 +133,8 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -161,18 +152,16 @@ jobs:
         working-directory: terraform/environments/prod
         run: terraform init
 
-      - name: Build
+      - name: Build docker
         run: |
           ECR_URL=$(terraform -chdir=terraform/environments/prod output -raw  ecr_repository_url)
-          docker build -t $ECR_URL:$GITHUB_RUN_ID -t $ECR_URL:latest ./sunset-recorder
+          docker pull $ECR_URL:latest || true
+          docker build --cache-from=$ECR_URL:latest -t $ECR_URL:latest ./sunset-recorder
 
       - name: Push image to Amazon ECR
         run: |
           ECR_URL=$(terraform -chdir=terraform/environments/prod output -raw  ecr_repository_url)
           docker push $ECR_URL:latest
-
-
-
 
 
   seeds:
@@ -212,3 +201,6 @@ jobs:
         run: |
           NAME=$(terraform -chdir=terraform/environments/prod output -raw  lambda_name)
           sh ./telegram-bot/seeds/seed.sh $NAME
+
+
+

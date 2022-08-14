@@ -4,6 +4,9 @@ import * as dotenv from 'dotenv'; // see https://github.com/motdotla/dotenv#how-
 dotenv.config();
 
 const configuration: ConfigurationVariables = {
+  app: {
+    timelapseFactor: process.env.APP_TIMELAPSE_FACTOR,
+  },
   aws: {
     region: process.env.AWS_REGION,
     bucketRecordsName: process.env.AWS_BUCKET_RECORDS,
