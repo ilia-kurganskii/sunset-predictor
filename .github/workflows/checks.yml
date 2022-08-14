@@ -143,7 +143,4 @@ jobs:
         run: |
           ECR_URL=$(terraform -chdir=terraform/environments/dev output -raw  ecr_repository_url)
           docker pull $ECR_URL:latest || true
-          docker build --cache-from:$ECR_URL:latest -t $ECR_URL:latest ./sunset-recorder
-
-
-
+          docker build --cache-from=$ECR_URL:latest -t $ECR_URL:latest ./sunset-recorder
