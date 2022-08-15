@@ -1,21 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Place } from '../models/place.model';
 import { AWSService } from './aws.service';
-import { getSunsetTime } from '../controllers/app.utils';
-import { WeatherService } from './weather.service';
+import { WeatherService } from './weather';
 import {
   AppConfig,
   ConfigurationVariables,
 } from '../config/configuration.model';
 import { ConfigService } from '@nestjs/config';
+import { GeoService } from './geo.service';
 
 @Injectable()
 export class PlaceService {
   private readonly logger = new Logger(PlaceService.name);
   private readonly appConfig: AppConfig;
+
   constructor(
     private readonly awsService: AWSService,
     private readonly weatherService: WeatherService,
+    private readonly geoService: GeoService,
     private readonly configService: ConfigService<ConfigurationVariables>,
   ) {
     this.appConfig = configService.get<AppConfig>('app');
@@ -95,12 +97,12 @@ export class PlaceService {
     sunsetTimestamp: number;
   }) {
     const { placeId, sunsetTimestamp, startOffset = 0 } = params;
-    const sunsetUtcDate = getSunsetTime(sunsetTimestamp - startOffset * 60);
+    const sunsetUtcDate = new Date(sunsetTimestamp - startOffset * 60 * 1000);
 
     const { ruleName } = await this.awsService.setRecorderRule({
       placeId: placeId,
-      hourUtc: sunsetUtcDate.hours,
-      minUtc: sunsetUtcDate.minutes,
+      hourUtc: sunsetUtcDate.getUTCHours(),
+      minUtc: sunsetUtcDate.getUTCMinutes(),
     });
 
     return { ruleName };

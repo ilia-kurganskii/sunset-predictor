@@ -1,6 +1,6 @@
-export interface Weather {
-  sunset: number;
+export interface OpenWeatherAPIWeatherModel {
   sunrise: number;
+  sunset: number;
   temp: number;
   pressure: number;
   humidity: number;
@@ -13,14 +13,6 @@ export interface Weather {
   wind_gust: number;
 }
 
-export interface RecordItem {
-  pollId: string;
-
-  // Weather
-  placeWeather: Weather;
-  sunsetWeather: Weather;
-  poll?: {
-    text: string;
-    voterCount: number;
-  }[];
+export interface OpenWeatherAPIWeatherResponseModel {
+  current: OpenWeatherAPIWeatherModel;
 }

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AWSService } from './aws.service';
-import { WeatherService } from './weather.service';
-import { TelegramService } from './telegram.service';
+import { WeatherService } from './weather';
+import { TelegramService } from './telegram';
 
 @Injectable()
 export class NotificationService {
@@ -25,6 +25,7 @@ export class NotificationService {
       caption: `Sunset in ${placeName}`,
       videoUrl: url,
     });
+
     const { pollId } = await this.telegramService.sendPoll({
       question: `Rate the sunset in ${placeName}^`,
       options: [

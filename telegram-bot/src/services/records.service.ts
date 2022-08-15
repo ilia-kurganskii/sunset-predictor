@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { AWSService } from './aws.service';
-import { WeatherService } from './weather.service';
+import { WeatherService } from './weather';
 import { GeoService } from './geo.service';
 import { Poll } from '../models/poll';
 
