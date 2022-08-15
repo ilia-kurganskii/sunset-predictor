@@ -4,7 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import {
   ConfigurationVariables,
   TelegramConfig,
-} from '../config/configuration.model';
+} from '../../config/configuration.model';
+import { TELEGRAM_HOST } from './telegram.conts';
 
 @Injectable()
 export class TelegramService {
@@ -70,7 +71,7 @@ export class TelegramService {
     try {
       return await this.httpService.axiosRef
         .post<T>(
-          `https://api.telegram.org/bot${this.telegramConfig.token}/${methodName}`,
+          `${TELEGRAM_HOST}/bot${this.telegramConfig.token}/${methodName}`,
           params,
         )
         .then((response) => response.data);

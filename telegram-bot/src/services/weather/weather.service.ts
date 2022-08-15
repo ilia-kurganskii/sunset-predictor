@@ -4,7 +4,11 @@ import { ConfigService } from '@nestjs/config';
 import {
   ConfigurationVariables,
   OpenWeatherConfig,
-} from '../config/configuration.model';
+} from '../../config/configuration.model';
+import { Weather } from '../../models/record.model';
+import { OpenWeatherAPIWeatherResponseModel } from './weather.model';
+import { WeatherDTO } from './weather.dto';
+import { OPEN_WEATHER_API_HOST } from './weather.const';
 
 @Injectable()
 export class WeatherService {
@@ -20,30 +24,21 @@ export class WeatherService {
   getCurrentWeather = async (params: {
     lat: string | number;
     lon: string | number;
-  }): Promise<{
-    sunrise: number;
-    sunset: number;
-    temp: number;
-    pressure: number;
-    humidity: number;
-    dew_point: number;
-    uvi: number;
-    clouds: number;
-    visibility: number;
-    wind_speed: number;
-    wind_deg: number;
-    wind_gust: number;
-  }> => {
+  }): Promise<Weather> => {
     const { lat, lon } = params;
     return await this.httpService.axiosRef
-      .get(`https://api.openweathermap.org/data/3.0/onecall`, {
-        params: {
-          lat,
-          lon,
-          units: 'metric',
-          appId: this.weatherConfig.token,
+      .get<OpenWeatherAPIWeatherResponseModel>(
+        `${OPEN_WEATHER_API_HOST}/data/3.0/onecall`,
+        {
+          params: {
+            lat,
+            lon,
+            units: 'metric',
+            appId: this.weatherConfig.token,
+          },
         },
-      })
-      .then((response) => response.data.current);
+      )
+      .then((response) => response.data.current)
+      .then((weather) => WeatherDTO.serviceToApp(weather));
   };
 }

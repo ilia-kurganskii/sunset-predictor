@@ -14,7 +14,7 @@ import {
 import { PlaceService } from '../services/place.service';
 import { NotificationService } from '../services/notification.service';
 import { RecordsService } from '../services/records.service';
-import { TelegramService } from '../services/telegram.service';
+import { TelegramService } from '../services/telegram';
 
 @Controller()
 export class AppController {
