@@ -9,15 +9,12 @@ on:
 jobs:
   terraform:
     name: "Terraform"
-    uses: ./.github/workflows/shared.terraform.yml
     environment: development
-    with:
-      terraform_dir: terraform/environments/dev
-    secrets:
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      OPEN_WEATHER_TOKEN: ${{ secrets.OPEN_WEATHER_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/shared.terraform.yml
+        with:
+          terraform_dir: terraform/environments/dev
+
 
 
