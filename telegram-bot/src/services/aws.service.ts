@@ -20,7 +20,7 @@ export class AWSService {
   private readonly logger = new Logger(AWSService.name);
 
   private readonly s3Client: S3;
-  private readonly dynamoDbClient: DynamoDBDocument;
+  private readonly dynamoDbDocumentClient: DynamoDBDocument;
   private readonly ecsClient: ECS;
   private readonly eventBridgeClient: EventBridge;
 
@@ -30,17 +30,19 @@ export class AWSService {
     this.awsConfig = configService.get<AWSConfig>('aws');
 
     this.s3Client = new S3({ region: this.awsConfig.region });
-    this.dynamoDbClient = DynamoDBDocument.from(
-      new DynamoDB({ region: this.awsConfig.region }),
-    );
+
     this.ecsClient = new ECS({ region: this.awsConfig.region });
     this.eventBridgeClient = new EventBridge({
       region: this.awsConfig.region,
     });
+
+    const dynamoDbClient = new DynamoDB({ region: this.awsConfig.region });
+    this.dynamoDbDocumentClient = DynamoDBDocument.from(dynamoDbClient);
   }
 
   async getSignedUrlForFile(file: string): Promise<string> {
     this.logger.debug(`Get signed url for file ${file}`);
+
     const command = new GetObjectCommand({
       Bucket: this.awsConfig.bucketRecordsName,
       Key: file,
@@ -50,6 +52,7 @@ export class AWSService {
 
   async removeVideo(file: string): Promise<void> {
     this.logger.debug(`Remove video for file ${file}`);
+
     await this.s3Client.deleteObject({
       Bucket: this.awsConfig.bucketRecordsName,
       Key: file,
@@ -59,7 +62,7 @@ export class AWSService {
   async putItemToRecordTable(item: RecordItem) {
     this.logger.debug(`Put item to record table pollId: ${item.pollId}`);
 
-    return this.dynamoDbClient.put({
+    return this.dynamoDbDocumentClient.put({
       TableName: this.awsConfig.dynamoDbRecordsName,
       Item: item,
     });
@@ -67,7 +70,8 @@ export class AWSService {
 
   async putItemToPlaceTable(item: Place): Promise<Place> {
     this.logger.debug(`Add item to place table with id ${item.id}`);
-    await this.dynamoDbClient.put({
+
+    await this.dynamoDbDocumentClient.put({
       TableName: this.awsConfig.dynamoDbPlaceName,
       Item: item,
     });
@@ -76,7 +80,8 @@ export class AWSService {
 
   async deleteItemFromPlaceTable(params: { placeId: string }): Promise<void> {
     this.logger.debug(`Remove item from place table with id ${params.placeId}`);
-    await this.dynamoDbClient.delete({
+
+    await this.dynamoDbDocumentClient.delete({
       TableName: this.awsConfig.dynamoDbPlaceName,
       Key: {
         id: params.placeId,
@@ -86,7 +91,8 @@ export class AWSService {
 
   async getPlaceById(id: string): Promise<Place> {
     this.logger.debug(`Get place by id "${id}"`);
-    const result = await this.dynamoDbClient.get({
+
+    const result = await this.dynamoDbDocumentClient.get({
       TableName: this.awsConfig.dynamoDbPlaceName,
       Key: {
         id,
@@ -97,7 +103,8 @@ export class AWSService {
 
   async getRecordByMessageId(pollId: string): Promise<RecordItem | undefined> {
     this.logger.debug(`Get record by pollId "${pollId}"`);
-    const result = await this.dynamoDbClient.get({
+
+    const result = await this.dynamoDbDocumentClient.get({
       TableName: this.awsConfig.dynamoDbRecordsName,
       Key: {
         pollId,
@@ -108,7 +115,8 @@ export class AWSService {
 
   async getAllPlaces(): Promise<Place[]> {
     this.logger.debug(`Get all places"`);
-    const result = await this.dynamoDbClient.scan({
+
+    const result = await this.dynamoDbDocumentClient.scan({
       TableName: this.awsConfig.dynamoDbPlaceName,
     });
     return result.Items as Place[];
@@ -120,12 +128,13 @@ export class AWSService {
     hourUtc: number;
   }): Promise<{ ruleName: string }> {
     const { hourUtc, minUtc, placeId } = params;
-    const ruleName = placeId;
     const cronTime = `cron(${minUtc} ${hourUtc} * * ? *)`;
+    const ruleName = getScheduleRuleName({ placeId });
+
     this.logger.debug(`Set recorder rule (${cronTime}) with name ${ruleName}`);
 
     await this.eventBridgeClient.putRule({
-      Name: placeId,
+      Name: ruleName,
       Description: `Rule to record sunset for placeId: ${placeId}`,
       RoleArn: this.awsConfig.eventBridgeRuleRoleArn,
       ScheduleExpression: cronTime,
@@ -138,7 +147,7 @@ export class AWSService {
   }
 
   async removeScheduleRule(params: { placeId: string }): Promise<void> {
-    const ruleName = params.placeId;
+    const ruleName = getScheduleRuleName({ placeId: params.placeId });
     this.logger.debug(`Remove rule with name ${ruleName}`);
 
     await this.removeTargetsForRule({ ruleName });
@@ -150,7 +159,7 @@ export class AWSService {
   private async removeTargetsForRule(params: {
     ruleName: string;
   }): Promise<void> {
-    const ruleName = params.ruleName;
+    const { ruleName } = params;
     this.logger.debug(`Remove targets for rule ${ruleName}`);
 
     const { Targets } = await this.eventBridgeClient.listTargetsByRule({
@@ -234,7 +243,8 @@ export class AWSService {
     ruleName: string;
   }) {
     const { placeId, taskDefinitionArn, ruleName } = params;
-    this.logger.debug(`Set rule(${ruleName}) targets: ${taskDefinitionArn} `);
+    this.logger.debug(`Set rule(${ruleName}) targets: ${taskDefinitionArn}`);
+
     await this.eventBridgeClient.putTargets({
       Rule: ruleName,
       Targets: [
@@ -262,4 +272,8 @@ export class AWSService {
 
 function getTaskDefinitionFamily(params: { placeId: string }) {
   return `${params.placeId}_sunset-recorder`;
+}
+
+function getScheduleRuleName(params: { placeId: string }) {
+  return `${params.placeId}`;
 }

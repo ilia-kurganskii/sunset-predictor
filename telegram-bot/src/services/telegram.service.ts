@@ -56,6 +56,7 @@ export class TelegramService {
   registerWebhook = async (params: { url: string }) => {
     const { url } = params;
     this.logger.log(`Register webhook url: ${url}`);
+
     await this.sendRequest('setWebhook', {
       url,
       allowed_updates: ['poll'],

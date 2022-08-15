@@ -42,7 +42,7 @@ jobs:
           TF_VAR_telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: terraform plan -no-color
+        run: terraform plan -no-color -lock=false
 
   telegram-bot:
     name: "Telegram bot"
