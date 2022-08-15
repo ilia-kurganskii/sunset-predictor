@@ -2,207 +2,22 @@ name: "Development"
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      -workflows
 
 jobs:
   terraform:
     name: "Terraform"
+    uses: ./.github/workflows/shared/terraform.yml
     environment: development
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          # terraform_version: 0.13.0:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Terraform Format
-        working-directory: terraform
-        id: fmt
-        run: terraform fmt -check -recursive -diff
-
-      - name: Terraform Init
-        working-directory: terraform/environments/dev
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        working-directory: terraform/environments/dev
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Apply (Dev)
-        working-directory: terraform/environments/dev
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          OPEN_WEATHER_TOKEN: ${{ secrets.OPEN_WEATHER_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-        run: |
-          terraform apply -auto-approve \
-            -var="telegram_token=$TELEGRAM_BOT_TOKEN" \
-            -var="telegram_chat_id=$TELEGRAM_CHAT_ID" \
-            -var="open_weather_token=$OPEN_WEATHER_TOKEN"
-
-  telegram-bot:
-    name: "Telegram bot"
-    environment: development
-    runs-on: ubuntu-latest
-    needs:
-      - terraform
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Terraform init
-        working-directory: terraform/environments/dev
-        run: terraform init
-
-      - name: Install dependencies
-        working-directory: telegram-bot
-        run: yarn install --frozen-lockfile
-
-      - name: Linter
-        working-directory: telegram-bot
-        run: yarn lint
-
-      - name: Build
-        working-directory: telegram-bot
-        run: yarn build
-
-      - name: Archive
-        working-directory: telegram-bot
-        run: |
-          yarn install --production
-          mv node_modules ./dist/
-          zip -r dist.zip ./dist
-
-      - name: Upload to S3
-        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-        run: |
-          BUCKET=$(terraform -chdir=terraform/environments/dev output -raw  s3_lambda_bucket)
-          BUCKET_KEY=$(terraform -chdir=terraform/environments/dev output -raw  s3_lambda_bucket_key)
-          aws s3 cp ./telegram-bot/dist.zip s3://$BUCKET/$BUCKET_KEY
-
-      - name: Update function
-        if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-        run: |
-          BUCKET=$(terraform -chdir=terraform/environments/dev output -raw  s3_lambda_bucket)
-          BUCKET_KEY=$(terraform -chdir=terraform/environments/dev output -raw  s3_lambda_bucket_key)
-          NAME=$(terraform -chdir=terraform/environments/dev output -raw  lambda_name)
-          aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $BUCKET_KEY --publish > /dev/null
-  
-
-  recorder-service:
-    name: "Recorder service"
-    environment: development
-    runs-on: ubuntu-latest
-    needs:
-      - terraform
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Terraform Init
-        working-directory: terraform/environments/dev
-        run: terraform init
-
-      - name: Build docker
-        run: |
-          ECR_URL=$(terraform -chdir=terraform/environments/dev output -raw  ecr_repository_url)
-          docker pull $ECR_URL:latest || true
-          docker build --cache-from=$ECR_URL:latest -t $ECR_URL:latest ./sunset-recorder
-
-      - name: Push image to Amazon ECR
-        run: |
-          ECR_URL=$(terraform -chdir=terraform/environments/dev output -raw  ecr_repository_url)
-          docker push $ECR_URL:latest
-
-  seeds:
-    environment: development
-    name: "Add places"
-    runs-on: ubuntu-latest
-    needs:
-      - terraform
-      - telegram-bot
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_wrapper: false
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Terraform init
-        working-directory: terraform/environments/dev
-        run: terraform init
-
-      - name: Add places
-        run: |
-          NAME=$(terraform -chdir=terraform/environments/dev output -raw  lambda_name)
-          FUNCTION_URL=$(terraform -chdir=terraform/environments/dev output -raw  lambda_function_url)
-          sh ./telegram-bot/seeds/seed.sh $NAME $FUNCTION_URL
+    with:
+      terraform_dir: terraform/environments/dev
+    secrets:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      OPEN_WEATHER_TOKEN: ${{ secrets.OPEN_WEATHER_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 

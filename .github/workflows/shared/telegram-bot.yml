@@ -1,0 +1,91 @@
+on:
+  workflow_call:
+    inputs:
+      terraform_dir:
+        required: true
+        type: string
+      cache_key:
+        required: true
+        type: string
+    secrets:
+      TF_API_TOKEN:
+        required: true
+
+jobs:
+  telegram-bot:
+    name: "Telegram bot"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache Telegram bot
+        id: cache-telegram
+        uses: actions/cache@v3
+        with:
+          path: telegram-bot
+          key: ${{ hashFiles('telegram-bot/**')  }}-${{ input.cache_key }}-telegram-bot
+
+      - name: Configure AWS credentials
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.ECR_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.ECR_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        with:
+          terraform_wrapper: false
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - uses: actions/setup-node@v3
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        with:
+          node-version: 16
+
+      - name: Terraform init
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        working-directory: ${{ inputs.terraform_dir }}
+        run: terraform init
+
+      - name: Install dependencies
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        working-directory: telegram-bot
+        run: yarn install --frozen-lockfile
+
+      - name: Linter
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        working-directory: telegram-bot
+        run: yarn lint
+
+      - name: Build
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        working-directory: telegram-bot
+        run: yarn build
+
+      - name: Archive
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        working-directory: telegram-bot
+        run: |
+          yarn install --production
+          mv node_modules ./dist/
+          zip -r dist.zip ./dist
+
+      - name: Upload to S3
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        run: |
+          BUCKET=$(terraform -chdir=${{ inputs.terraform_dir }} output -raw  s3_lambda_bucket)
+          BUCKET_KEY=$(terraform -chdir=${{ inputs.terraform_dir }} output -raw  s3_lambda_bucket_key)
+          aws s3 cp ./telegram-bot/dist.zip s3://$BUCKET/$BUCKET_KEY
+
+      - name: Update function
+        if: steps.cache-telegram.outputs.cache-hit != 'true'
+        run: |
+          BUCKET=$(terraform -chdir=${{ inputs.terraform_dir }} output -raw  s3_lambda_bucket)
+          BUCKET_KEY=$(terraform -chdir=${{ inputs.terraform_dir }} output -raw  s3_lambda_bucket_key)
+          NAME=$(terraform -chdir=${{ inputs.terraform_dir }} output -raw  lambda_name)
+          aws lambda update-function-code --function-name $NAME --s3-bucket $BUCKET --s3-key $BUCKET_KEY --publish > /dev/null

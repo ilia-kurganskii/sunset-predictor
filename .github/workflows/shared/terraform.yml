@@ -1,0 +1,75 @@
+on:
+  workflow_call:
+    inputs:
+      terraform_dir:
+        required: true
+        type: string
+      terraform_apply:
+        required: true
+        type: boolean
+    secrets:
+      TF_API_TOKEN:
+        required: true
+      TELEGRAM_BOT_TOKEN:
+        required: true
+      OPEN_WEATHER_TOKEN:
+        required: true
+      TELEGRAM_CHAT_ID:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          # terraform_version: 0.13.0:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        working-directory: terraform
+        id: fmt
+        run: terraform fmt -check -recursive -diff
+
+      - name: Terraform Init
+        working-directory: ${{ inputs.terraform_dir }}
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        working-directory: ${{ inputs.terraform_dir }}
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        working-directory: ${{ inputs.terraform_dir }}
+        if: input.terraform_apply == false
+        env:
+          TF_VAR_TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TF_VAR_OPEN_WEATHER_TOKEN: ${{ secrets.OPEN_WEATHER_TOKEN }}
+          TF_VAR_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          terraform plan -lock=false
+
+      - name: Terraform Apply
+        working-directory: ${{ inputs.terraform_dir }}
+        if: input.terraform_apply
+        env:
+          TF_VAR_TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TF_VAR_OPEN_WEATHER_TOKEN: ${{ secrets.OPEN_WEATHER_TOKEN }}
+          TF_VAR_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          terraform apply -auto-approve
