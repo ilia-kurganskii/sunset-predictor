@@ -2960,10 +2960,10 @@ aws-lambda@1.0.7:
     js-yaml "^3.14.1"
     watchpack "^2.0.0-beta.10"
 
-aws-sdk@^2.1187.0:
-  version "2.1190.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1190.0.tgz#9ca291c27ff9dc3428a9211048754df9d01734c9"
-  integrity sha512-VJ3kpqjqww3u2OUOpvDA4EWU2HYetk0/5PQONqXR9N4dAvs8BP/Rv4BoYM/9m4rfhdBEMWizdye7epbBNxb4ZQ==
+aws-sdk@^2.1194.0:
+  version "2.1195.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1195.0.tgz#f6f091426934ba1a4f8d5138f568e840f7bdb51a"
+  integrity sha512-xU7177JhKM+4SsLnoA6/r3qGzSXmbLgw/YC1KRHvZyJCbuTY+vdAGLaldbtNXjjwmE3a6EeoCREANv8GY62VdQ==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -6662,16 +6662,16 @@ serialize-javascript@^6.0.0:
   dependencies:
     randombytes "^2.1.0"
 
-serverless-offline@9.1.7:
-  version "9.1.7"
-  resolved "https://registry.yarnpkg.com/serverless-offline/-/serverless-offline-9.1.7.tgz#f7b5022748311f6f9e559cece56539380b36a3ac"
-  integrity sha512-ZuIOkK1/svdP71X/EEfCBIpBfg/tJohUdE9v+//Ob+ZNxO/m7aLAUGaynYfANdn89SKMCLhRp8pEKGr6dy8EMA==
+serverless-offline@9.2.1:
+  version "9.2.1"
+  resolved "https://registry.yarnpkg.com/serverless-offline/-/serverless-offline-9.2.1.tgz#1f22688c6b81fbdb658e0df1bf2ec2272fffc94c"
+  integrity sha512-UH0ibJLV2lgIOJAnz7HSYiXIvcyP/Luhoc+LmSsITEwp0D7advILb57qmICDV+rlGIk1Przy2ur6Hc6AGFHpfQ==
   dependencies:
     "@hapi/boom" "^10.0.0"
     "@hapi/h2o2" "^9.1.0"
     "@hapi/hapi" "^20.2.2"
     "@serverless/utils" "^6.7.0"
-    aws-sdk "^2.1187.0"
+    aws-sdk "^2.1194.0"
     boxen "^7.0.0"
     chalk "^5.0.1"
     execa "^6.1.0"
