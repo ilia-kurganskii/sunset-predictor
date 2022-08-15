@@ -9,7 +9,7 @@ on:
 jobs:
   terraform:
     name: "Terraform"
-    uses: ./.github/workflows/shared/terraform.yml
+    uses: ./.github/workflows/shared.terraform.yml
     environment: development
     with:
       terraform_dir: terraform/environments/dev
