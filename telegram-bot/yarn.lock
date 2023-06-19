@@ -2840,10 +2840,10 @@ aws-lambda@1.0.7:
     js-yaml "^3.14.1"
     watchpack "^2.0.0-beta.10"
 
-aws-sdk@^2.1194.0:
-  version "2.1195.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1195.0.tgz#f6f091426934ba1a4f8d5138f568e840f7bdb51a"
-  integrity sha512-xU7177JhKM+4SsLnoA6/r3qGzSXmbLgw/YC1KRHvZyJCbuTY+vdAGLaldbtNXjjwmE3a6EeoCREANv8GY62VdQ==
+aws-sdk@^2.1205.0:
+  version "2.1206.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1206.0.tgz#8c5ed249952fb86b29cb4cf037e03b3136247341"
+  integrity sha512-rQckMXO+O1j7RxuC9Ic6+OjroLm4t9vYHCubSeSEj8bJCFEh/1aRO1eiMHcLGhI4jl3LijfTCX56YZJjDp2PdQ==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
@@ -5412,10 +5412,10 @@ jsonfile@^6.0.1:
   optionalDependencies:
     graceful-fs "^4.1.6"
 
-jsonpath-plus@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/jsonpath-plus/-/jsonpath-plus-7.0.0.tgz#b3c7648b33041c0013c5ff534fd17aadc817bf03"
-  integrity sha512-MH4UnrWrU1hJGVEyEyjvYgONkzNTO6Yol0nq18EMnUQ/ZC5cTuJheirXXIwu1b9mZ6t3XL0P79gPsu+zlTnDIQ==
+jsonpath-plus@^7.1.0:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/jsonpath-plus/-/jsonpath-plus-7.1.0.tgz#9ac63c3d32a4d91ada68d57e056cb7983e73290a"
+  integrity sha512-gTaNRsPWO/K2KY6MrqaUFClF9kmuM6MFH5Dhg1VYDODgFbByw1yb7xu3hrViE/sz+dGOeMWgCzwUwQtAnCTE9g==
 
 jsonschema@^1.4.1:
   version "1.4.1"
@@ -5641,10 +5641,10 @@ luxon@^1.26.0:
   resolved "https://registry.yarnpkg.com/luxon/-/luxon-1.28.0.tgz#e7f96daad3938c06a62de0fb027115d251251fbf"
   integrity sha512-TfTiyvZhwBYM/7QdAVDh+7dBTBA29v4ik0Ce9zda3Mnf8on1S5KJI8P2jKFZ8+5C0jhmr0KwJEO/Wdpm0VeWJQ==
 
-luxon@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.0.1.tgz#6901111d10ad06fd267ad4e4128a84bef8a77299"
-  integrity sha512-hF3kv0e5gwHQZKz4wtm4c+inDtyc7elkanAsBq+fundaCdUBNJB1dHEGUZIM6SfSBUlbVFduPwEtNjFK8wLtcw==
+luxon@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/luxon/-/luxon-3.0.3.tgz#573e65531efd3d92265feb640f02ba7a192e2388"
+  integrity sha512-+EfHWnF+UT7GgTnq5zXg3ldnTKL2zdv7QJgsU5bjjpbH17E3qi/puMhQyJVYuCq+FRkogvB5WB6iVvUr+E4a7w==
 
 macos-release@^2.5.0:
   version "2.5.0"
@@ -6542,27 +6542,27 @@ serialize-javascript@^6.0.0:
   dependencies:
     randombytes "^2.1.0"
 
-serverless-offline@9.2.1:
-  version "9.2.1"
-  resolved "https://registry.yarnpkg.com/serverless-offline/-/serverless-offline-9.2.1.tgz#1f22688c6b81fbdb658e0df1bf2ec2272fffc94c"
-  integrity sha512-UH0ibJLV2lgIOJAnz7HSYiXIvcyP/Luhoc+LmSsITEwp0D7advILb57qmICDV+rlGIk1Przy2ur6Hc6AGFHpfQ==
+serverless-offline@9.3.1:
+  version "9.3.1"
+  resolved "https://registry.yarnpkg.com/serverless-offline/-/serverless-offline-9.3.1.tgz#b06cc5ee5cdc6f6878886a4e796fc3b55a94281c"
+  integrity sha512-zODyqPPxqPWYXCKJFZiG+vvsKhjKOWiw/REkXqZQZRIa4Ps66sXL7uVJ3qtYf7FErzm9Oe03QyUyBi74weKX3Q==
   dependencies:
     "@hapi/boom" "^10.0.0"
     "@hapi/h2o2" "^9.1.0"
     "@hapi/hapi" "^20.2.2"
     "@serverless/utils" "^6.7.0"
-    aws-sdk "^2.1194.0"
+    aws-sdk "^2.1205.0"
     boxen "^7.0.0"
     chalk "^5.0.1"
     execa "^6.1.0"
     fs-extra "^10.1.0"
     java-invoke-local "0.0.6"
     js-string-escape "^1.0.1"
-    jsonpath-plus "^7.0.0"
+    jsonpath-plus "^7.1.0"
     jsonschema "^1.4.1"
     jsonwebtoken "^8.5.1"
     jszip "^3.10.1"
-    luxon "^3.0.1"
+    luxon "^3.0.3"
     node-fetch "^3.2.10"
     node-schedule "^2.1.0"
     object.hasown "^1.1.1"
